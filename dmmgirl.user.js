@@ -148,11 +148,11 @@ var detail={
 			}
 		}
 		i+=4;//get actress
-		var actress=field[i].innerHTML.slice(1,-278)
+		var actress=field[i]
 		i+=6;//get maker
 		var maker=field[i]
 		var title=document.getElementById('title')//get title
-		var detail=date.innerHTML+'#'+actress.replace(/\n/g,"")+'#'+maker.innerHTML+'#'+title.innerHTML;
+		var detail=date.innerHTML+'#'+actress.innerHTML+'#'+maker.innerHTML+'#'+title.innerHTML;
 		localStorage.setItem(tool.getCid(location.pathname),detail);
 	}
 
@@ -178,8 +178,11 @@ var list={
 		if (this.src.search('noimage')===-1){
 			var thumb=document.getElementById('hoverpic');
 			thumb.src=this.src.replace("pt.jpg","ps.jpg");
-			thumb.style.left=this.x-29+'px';//147*200,90*122
-			thumb.style.top=this.y-39+'px';
+			var pos=this.getBoundingClientRect();
+			thumb.style.left=pos.left-29+window.pageXOffset+'px';//147*200,90*122
+			thumb.style.top=pos.top-39+window.pageYOffset+'px';
+			thumb.width=147;
+			thumb.height=200;
 			thumb.style.display='block';
 			thumb.parentNode.href='http://www.dmm.co.jp/mono/dvd/-/detail/=/cid='+tool.getCid(this.src)+'/';
 		}
