@@ -11,7 +11,6 @@ var detail={
 	max:10,
 	init:function(){
 		this.replaceRcolumn();
-		this.removeComment();
 		this.showCover();
 		unsafeWindow.sample_spread();//Show all preview pics
 		this.addPreloadRadio();
@@ -19,12 +18,14 @@ var detail={
 	//==Add preload radio button==
 	addPreloadRadio:function(){
 		var headline=document.getElementsByClassName("headline mg-b10 lh3")[0];
-		var link=document.createElement('input');
-		link.type="radio";
-		link.id="prelink";
-		link.addEventListener("click",this.evtPreloadSample,false);
-		headline.appendChild(link);
-		headline.appendChild(document.createTextNode("Preload "));
+		if (headline){
+			var link=document.createElement('input');
+			link.type="radio";
+			link.id="prelink";
+			link.addEventListener("click",this.evtPreloadSample,false);
+			headline.appendChild(link);
+			headline.appendChild(document.createTextNode("Preload "));
+		}
 	},
 	//==Preload previews==
 	evtPreloadSample:function(){
@@ -113,9 +114,16 @@ var detail={
 		var info=document.getElementsByClassName('mg-b20')[1];
 		var tbody=info.firstElementChild; //remove last 2 rows
 		tbody.removeChild(tbody.lastElementChild);
-		var star=tbody.lastElementChild.lastElementChild;
-		var vote=document.getElementsByClassName('count')[0];
-		star.lastElementChild.innerHTML='('+vote.innerHTML+')';
+		var review=document.getElementById('review-list');
+		if (review){
+			var star=tbody.lastElementChild.lastElementChild;
+			var vote=document.getElementsByClassName('count')[0];
+			if (vote){
+				star.lastElementChild.innerHTML='('+vote.innerHTML+')';
+			}
+			else {star.lastElementChild.innerHTML='(0)'}
+			review.parentNode.parentNode.removeChild(review.parentNode);
+		}
 		var desc=info.nextElementSibling.nextElementSibling;
 		var another=document.getElementsByClassName('another')[0];
 		var actress=document.getElementById('avcast_text');
@@ -139,11 +147,6 @@ var detail={
 			rcolumn.appendChild(another);
 		}
 		rcolumn.appendChild(actress);
-	},
-	//==Remove review==
-	removeComment:function(){
-		var review=document.getElementById('review');
-		review.parentNode.removeChild(review);
 	},
 	//==Add to wishlist==
 	evtAddWish:function(){
