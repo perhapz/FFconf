@@ -101,10 +101,11 @@ var detail={
 	},
 	//==Show big cover==
 	showCover:function (){
-		var sample=document.getElementById('sample-video');
-		var img=sample.firstElementChild.firstElementChild.firstElementChild;
-		img.src=img.parentNode.href.replace('ps.jpg','pl.jpg');
+		var sample=document.getElementsByClassName('float-l mg-b20 mg-r12')[0];
+		var img=document.getElementsByClassName('tdmm')[0];
+		img.src=img.src.replace('ps.jpg','pl.jpg');
 		removeChildren(sample);
+		sample.className='mg-b20 mg-r12';
 		sample.appendChild(img);
 	},
 	replaceRcolumn:function(){
@@ -112,8 +113,11 @@ var detail={
 		var info=document.getElementsByClassName('mg-b20')[1];
 		var tbody=info.firstElementChild; //remove last 2 rows
 		tbody.removeChild(tbody.lastElementChild);
-		tbody.removeChild(tbody.lastElementChild);
+		var star=tbody.lastElementChild.lastElementChild;
+		var vote=document.getElementsByClassName('count')[0];
+		star.lastElementChild.innerHTML='('+vote.innerHTML+')';
 		var desc=info.nextElementSibling.nextElementSibling;
+		var another=document.getElementsByClassName('another')[0];
 		var actress=document.getElementById('avcast_text');
 		removeChildren(rcolumn);
 		var div=document.createElement('div');
@@ -131,6 +135,9 @@ var detail={
 		rcolumn.appendChild(div);
 		rcolumn.appendChild(info);
 		rcolumn.appendChild(desc);
+		if (another){
+			rcolumn.appendChild(another);
+		}
 		rcolumn.appendChild(actress);
 	},
 	//==Remove review==
