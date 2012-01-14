@@ -297,7 +297,40 @@ var tool={
 		return cid;
 	},
 };
-
+var fav={
+	addMaker:function(){
+		var makerNames=new Array();
+		makerNames[0]='Moodyz'
+		makerNames[1]='SOD'
+		makerNames[2]='IP'
+		makerNames[3]='S1'
+		makerNames[4]='Prestige'
+		makerNames[5]='EBODY'
+		var makerLinks=new Array();
+		makerLinks[0]='1509'
+		makerLinks[1]='45276'
+		makerLinks[2]='1219'
+		makerLinks[3]='3152'
+		makerLinks[4]='40136'
+		makerLinks[5]='5032'
+		var navBar = document.getElementsByClassName("hd-lnav group")[0].firstElementChild;
+		for (var i = 0; i < makerNames.length; i++){
+			var li=document.createElement('li');
+			var maker=document.createElement('a');
+			maker.href='/mono/dvd/-/list/=/article=maker/id='+makerLinks[i]+'/sort=date/';
+			maker.appendChild(document.createTextNode(makerNames[i]));
+			li.appendChild(maker);
+			navBar.appendChild(li);
+		}
+		var wishLink=document.createElement('a');
+		wishLink.href='http://www.dmm.co.jp/coupon/check.html/=/navi=none/';
+		wishLink.appendChild(document.createTextNode('Wishlist'));
+		wishLink.style.marginLeft='5px';
+		var key=document.getElementsByClassName('popular-keyword')[0];
+		key.appendChild(wishLink);
+		key.style.right='-35px';
+	}
+}
 removeChildren=function(e){
 	while(e.firstChild){
 	e.removeChild(e.firstChild);
@@ -309,12 +342,14 @@ var page=/\/coupon\/check\.html|\/detail\/|\/list\//.exec(location.pathname);
 switch (page[0]){
 	case '/list/':
 		list.init();
+		fav.addMaker();
 		break;
 	case '/coupon/check.html':
 		wish.init();
 		break;
 	case '/detail/':
 		detail.init();
+		fav.addMaker();
 		break;
 }
 //})();
