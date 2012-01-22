@@ -12,7 +12,7 @@ var detail={
 	init:function(){
 		this.replaceRcolumn();
 		this.showCover();
-		unsafeWindow.sample_spread();//Show all preview pics
+		//unsafeWindow.sample_spread();//Show all preview pics
 		this.addPreloadRadio();
 	},
 	//==Add preload radio button==
