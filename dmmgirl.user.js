@@ -1,23 +1,22 @@
 // ==UserScript==
 // @name           DMMGirl
 // @namespace      null
-// @description    DMM Tweak
+// @description    DMM.R18/mono/dvd tweak for non-member: show big cover, preload sample picture, local wishlist, remove member functions...
+// @version        1.0.1
 // @include        http://www.dmm.co.jp/mono/dvd/-/list/*
 // @include        http://www.dmm.co.jp/coupon/check.html/=/navi=none/*
 // @include        http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=*
 // ==/UserScript==
-//(function(){
 var detail={
 	max:10,
 	init:function(){
 		this.replaceRcolumn();
 		this.showCover();
-		//unsafeWindow.sample_spread();//Show all preview pics
 		this.addPreloadRadio();
 	},
 	//==Add preload radio button==
 	addPreloadRadio:function(){
-		var headline=document.getElementsByClassName("headline mg-b10 lh3")[0];
+		var headline=getCn("headline mg-b10 lh3")[0];
 		if (headline){
 			var link=document.createElement('input');
 			link.type="radio";
@@ -30,10 +29,10 @@ var detail={
 	//==Preload previews==
 	evtPreloadSample:function(){
 		this.removeEventListener('click', detail.evtPreloadSample, false);
-		var sample=document.getElementsByClassName('mg-b6');
+		var sample=getCn('mg-b6');
 		var i=0;
 		detail.max=sample.length;
-		var block=document.getElementById("sample-image-block");
+		var block=getId("sample-image-block");
 		var newblock=document.createElement('div');
 		if (sample[0].tagName==="DIV"){
 			i=1;
@@ -48,8 +47,6 @@ var detail={
 			newblock.appendChild(pic);
 			}
 		block.parentNode.replaceChild(newblock,block);
-		var block1=document.getElementById('block1');
-		block1.parentNode.removeChild(block1);
 	},
 	//==Show preview gallery==
 	evtShowPic:function(){
@@ -64,7 +61,6 @@ var detail={
 		box.style.position='absolute';
 		box.style.left=window.pageXOffset+(window.innerWidth-origin.width)/2+'px';
 		box.style.top=window.pageYOffset+(window.innerHeight-origin.height)/2+'px';
-		//box.style.textAlign='center';
 		box.style.zIndex=21;
 		var leftd=document.createElement('div');
 		leftd.id='leftd';
@@ -88,8 +84,6 @@ var detail={
 		var num=-1;
 		if (this.id==='leftd'){num=1;}
 		nextnum=curpic.src.match(/jp-[0-9]+/)[0].replace('jp-','')-num;
-		//console.log(detail.max);
-		//console.log(nextnum);
 		if(nextnum<=detail.max&&nextnum>0){
 			nextnum='jp-'+nextnum;
 			var nextpic=new Image();
@@ -102,31 +96,31 @@ var detail={
 	},
 	//==Show big cover==
 	showCover:function (){
-		var sample=document.getElementsByClassName('float-l mg-b20 mg-r12')[0];
-		var img=document.getElementsByClassName('tdmm')[0];
+		var sample=getCn('float-l mg-b20 mg-r12')[0];
+		var img=getCn('tdmm')[0];
 		img.src=img.src.replace('ps.jpg','pl.jpg');
 		removeChildren(sample);
 		sample.className='mg-b20 mg-r12';
 		sample.appendChild(img);
 	},
 	replaceRcolumn:function(){
-		var rcolumn=document.getElementsByClassName('vline')[0].nextElementSibling;
-		var info=document.getElementsByClassName('mg-b20')[1];
+		var rcolumn=getCn('vline')[0].nextElementSibling;
+		var info=getCn('mg-b20')[1];
 		var tbody=info.firstElementChild; //remove last 2 rows
 		tbody.removeChild(tbody.lastElementChild);
-		var review=document.getElementById('review-list');
+		var review=getId('review-list');
 		if (review){
 			var star=tbody.lastElementChild.lastElementChild;
-			var vote=document.getElementsByClassName('count')[0];
+			var vote=getCn('count')[0];
 			if (vote){
 				star.lastElementChild.innerHTML='('+vote.innerHTML+')';
 			}
-			else {star.lastElementChild.innerHTML='(0)'}
+			else {star.lastElementChild.innerHTML='(0)';}
 			review.parentNode.parentNode.removeChild(review.parentNode);
 		}
 		var desc=info.nextElementSibling.nextElementSibling;
-		var another=document.getElementsByClassName('another')[0];
-		var actress=document.getElementById('avcast_text');
+		var another=getCn('another')[0];
+		var actress=getId('avcast_text');
 		removeChildren(rcolumn);
 		var div=document.createElement('div');
 		div.setAttribute('style','font-size:1.2em;font-weight:bold;background-color:#F7FDFF;border:1px solid #CCCCCC;padding: 5px;margin-bottom:20px;')
@@ -161,32 +155,32 @@ var detail={
 		var actress=field[i]
 		i+=6;//get maker
 		var maker=field[i]
-		var title=document.getElementById('title')//get title
+		var title=getId('title')//get title
 		var detail=date.innerHTML+'#'+actress.innerHTML+'#'+maker.innerHTML+'#'+title.innerHTML;
-		localStorage.setItem(tool.getCid(location.pathname),detail);
+		localStorage.setItem(getCid(location.pathname),detail);
 	}
 
 
 };
 var list={
 	init:function(){
-		var smallThumb = document.getElementsByClassName("mg-r6");
+		var smallThumb = getCn("mg-r6");
 		for (var i = 0; i < smallThumb.length; i++){
-			smallThumb[i].addEventListener("mouseover",this.showThumb,false);
+			smallThumb[i].addEventListener("mouseover",this.evtShowThumb,false);
 		}
 		var thumb=new Image();
 		thumb.id='hoverpic';
 		thumb.style.position='absolute';
 		thumb.style.zIndex=22;
 		thumb.style.display='none';
-		thumb.addEventListener("mouseout",this.removeThumb,false);
+		thumb.addEventListener("mouseout",this.evtRemoveThumb,false);
 		var a=document.createElement('a');
 		a.appendChild(thumb);
 		document.body.appendChild(a);
 	},
-	showThumb:function(){
+	evtShowThumb:function(){
 		if (this.src.search('noimage')===-1){
-			var thumb=document.getElementById('hoverpic');
+			var thumb=getId('hoverpic');
 			thumb.src=this.src.replace("pt.jpg","ps.jpg");
 			var pos=this.getBoundingClientRect();
 			thumb.style.left=pos.left-29+window.pageXOffset+'px';//147*200,90*122
@@ -194,16 +188,18 @@ var list={
 			thumb.width=147;
 			thumb.height=200;
 			thumb.style.display='block';
-			thumb.parentNode.href='http://www.dmm.co.jp/mono/dvd/-/detail/=/cid='+tool.getCid(this.src)+'/';
+			thumb.parentNode.href='http://www.dmm.co.jp/mono/dvd/-/detail/=/cid='+getCid(this.src)+'/';
 		}
 	},
-	removeThumb:function(){
+	evtRemoveThumb:function(){
 		this.style.display='none';
 		this.src=null;
 		this.parentNode.href=null;
 	}
 };
 var wish={
+	dvd:new Array(),
+	sortType: ['cid','date','actress','maker'],
 	init:function(){
 		document.title='Wishlist';
 		GM_addStyle(' \
@@ -213,6 +209,7 @@ var wish={
 			a:hover,a:active {color:#EE2200; text-decoration:underline;} \
 			table {text-align:center; width:590px; border-collapse:separate; border-spacing:5px;} \
 			table th {font-size:1.1em; padding:2px; background-color:#242424; color:#ffffff} \
+			table th:hover {cursor:pointer} \
 			table td {padding:2px; background-color:#F8F8F8; border:1px solid #CCCCCC;} \
 			p {text-align:left}'
 		);
@@ -222,137 +219,152 @@ var wish={
 					<tr> \
 						<th width="3%">#</th> \
 						<th width="15%">Cover</th> \
-						<th width="30%">CID</th> \
-						<th width="17%">Actress</th> \
-						<th width="17%">Maker</th> \
-						<th width="14%">Date</th> \
+						<th width="30%" id="cid">CID</th> \
+						<th width="17%" id="actress">Actress</th> \
+						<th width="17%" id="maker">Maker</th> \
+						<th width="14%" id="date">Date</th> \
 						<th width="4%">X</th> \
 					</tr> \
 				</thead> \
 				<tbody id="wishlist"></tbody> \
 			</table>';
+		this.createObj();
 		this.fillTable();
-		this.replaceMaker();
+	},
+	evtSort:function(){
+		for (var i=0;i<4;i++){
+			getId(wish.sortType[i]).style.backgroundColor='#242424';
+		}
+		this.style.backgroundColor='#C10000';
+		wish.dvd.sort(wish.by(this.id));
+		wish.fillTable();
+	},
+	by:function(type){
+		return function(a,b){
+			var c=a[type];
+			var d=b[type];
+			if(c===d){
+				return 0;
+			}
+			if(c<d){
+				return -1;
+			}
+				else{return 1;} 
+		}
+	},
+	createObj:function(){
+		function Dvd(cid,date,actress,maker,title){
+			this.cid=cid
+			this.date=date;
+			this.actress=actress;
+			this.maker=maker;
+			this.title=title;
+		}
+		Dvd.prototype.cid2=function(){
+			if (this.cid.match(/^15/)){return this.cid+'so';}
+			else return this.cid;
+		}
+		for(var i=0;i<localStorage.length;i++){
+			var cid=localStorage.key(i);
+			var info=localStorage[cid].split('#'); //Date[0]#Actress[1]#Maker[2]#Title[3]
+			info[1]=info[1].replace(/></g,'><br /><');
+			this.dvd[i]=new Dvd(cid,info[0],info[1],info[2],info[3])
+		}
+		//this.dvd.sort(this.by('date'));
 	},
 	fillTable:function(){
-		var list = document.getElementById('wishlist'); 
-		for(var i=0;i<localStorage.length;i++){
+		for (var i=0;i<4;i++){
+			getId(this.sortType[i]).addEventListener("click",this.evtSort,false);
+		}
+		var list = getId('wishlist'); 
+		removeChildren(list);
+		for(var i=0;i<this.dvd.length;i++){
 			var item=document.createElement('tr');
-			var cid=localStorage.key(i);
-			var cid2=cid;
-			if (cid.match(/^15/)){cid2=cid2+'so';}
-			var j=i+1;
-			var info=localStorage.getItem(cid).split('#'); //Date[0]#Actress[1]#Maker[2]#Title[3]
-			info[1]=info[1].replace(/></g,'><br /><');
 			item.innerHTML = ' \
-				<td height="130">' + j + '</td> \
-				<td><img src="http://pics.dmm.co.jp/mono/movie/'+cid2+'/'+cid2 +'pt.jpg" /></td> \
-				<td><a href="http://www.dmm.co.jp/mono/dvd/-/detail/=/cid='+cid+'/">'+cid+'<br /></a><p>'+info[3]+'</p></td> \
-				<td>'+info[1]+'</td> \
-				<td name="maker">'+info[2]+'</td> \
-				<td>'+info[0]+'</td> \
-				<td><a href="" onclick="localStorage.removeItem(\''+cid+'\')">'+'X'+'</a></td>';
+				<td height="130">' + (i+1) + '</td> \
+				<td><img src="http://pics.dmm.co.jp/mono/movie/'+this.dvd[i].cid2()+'/'+this.dvd[i].cid2() +'pt.jpg" /></td> \
+				<td><a href="http://www.dmm.co.jp/mono/dvd/-/detail/=/cid='+this.dvd[i].cid+'/">'+this.dvd[i].cid+'<br /></a><p>'+this.dvd[i].title+'</p></td> \
+				<td>'+this.dvd[i].actress+'</td> \
+				<td name="maker">'+this.dvd[i].maker+'</td> \
+				<td>'+this.dvd[i].date+'</td> \
+				<td><a href="" onclick="localStorage.removeItem(\''+this.dvd[i].cid+'\')">'+'X'+'</a></td>';
 			list.appendChild(item);
 		}
 		
-	},
-	replaceMaker:function(){
-		var maker=document.getElementsByName('maker');
-		for(i=0;i<maker.length;i++){
-			var mid=new String(maker[i].firstChild.href.match('id=[^/#]+'));
-			mid=mid.replace('id=','');
-			var name=maker[i].firstChild;
-			switch (mid){
-			case '1219':
-				name.innerHTML='IdeaPocket';
-				break;
-			case '3152':
-				name.innerHTML='S1';
-				break;
-			case '45276':
-				name.innerHTML='SODcreate';
-				break;
-			case '3890':
-				name.innerHTML='PREMIUM';
-				break;
-			case '1509':
-				name.innerHTML='MOODZY';
-				break;
-			case '40136':
-				name.innerHTML='PRESTIGE';
-				break;
-			case '45217':
-				name.innerHTML='MAXING';
-				break;
-			case '40046':
-				name.innerHTML='MAX-A';
-				break;
-			}
-		}
 	}
 };
-var tool={
-	getCid:function(str){
+var fav={
+	init:function(){
+		this.addMaker();
+		this.addLink();
+	},
+	addMaker:function(){
+		function Maker(name,id){
+			this.name=name;
+			this.id=id;
+		}
+		var maker=new Array();
+		maker[0]=new Maker('Moodyz',1509);
+		maker[1]=new Maker('SOD',45276);
+		maker[2]=new Maker('IP',1219);
+		maker[3]=new Maker('S1',3152);
+		maker[4]=new Maker('Prestige',40136);
+		maker[5]=new Maker('EBODY',5032);
+		var navBar = getCn("hd-lnav group")[0].firstElementChild;
+		for (var i = 0; i < maker.length; i++){
+			var li=document.createElement('li');
+			var makerLink=document.createElement('a');
+			makerLink.href='/mono/dvd/-/list/=/article=maker/id='+maker[i].id+'/sort=date/';
+			makerLink.appendChild(document.createTextNode(maker[i].name));
+			li.appendChild(makerLink);
+			navBar.appendChild(li);
+		}
+	},
+	addLink:function(){
+		var wishLink=document.createElement('a');
+		wishLink.href='http://www.dmm.co.jp/coupon/check.html/=/navi=none/';
+		wishLink.appendChild(document.createTextNode('Wishlist'));
+		wishLink.style.marginLeft='5px';
+		var key=getCn('popular-keyword')[0];
+		key.appendChild(wishLink);
+		key.style.right='-45px';
+	}
+}
+
+//Get cid of the dvd.
+getCid=function(str){
 		var patt1=/cid=[^\/#]+|[^\/]+pt\.jpg$/
 		var patt2=/^cid=|pt\.jpg$|sopt\.jpg$/
 		var cid=str.match(patt1);
 		cid=cid[0].replace(patt2,'');
 		return cid;
-	},
-};
-var fav={
-	addMaker:function(){
-		var makerNames=new Array();
-		makerNames[0]='Moodyz'
-		makerNames[1]='SOD'
-		makerNames[2]='IP'
-		makerNames[3]='S1'
-		makerNames[4]='Prestige'
-		makerNames[5]='EBODY'
-		var makerLinks=new Array();
-		makerLinks[0]='1509'
-		makerLinks[1]='45276'
-		makerLinks[2]='1219'
-		makerLinks[3]='3152'
-		makerLinks[4]='40136'
-		makerLinks[5]='5032'
-		var navBar = document.getElementsByClassName("hd-lnav group")[0].firstElementChild;
-		for (var i = 0; i < makerNames.length; i++){
-			var li=document.createElement('li');
-			var maker=document.createElement('a');
-			maker.href='/mono/dvd/-/list/=/article=maker/id='+makerLinks[i]+'/sort=date/';
-			maker.appendChild(document.createTextNode(makerNames[i]));
-			li.appendChild(maker);
-			navBar.appendChild(li);
-		}
-		var wishLink=document.createElement('a');
-		wishLink.href='http://www.dmm.co.jp/coupon/check.html/=/navi=none/';
-		wishLink.appendChild(document.createTextNode('Wishlist'));
-		wishLink.style.marginLeft='5px';
-		var key=document.getElementsByClassName('popular-keyword')[0];
-		key.appendChild(wishLink);
-		key.style.right='-35px';
-	}
 }
+
 removeChildren=function(e){
 	while(e.firstChild){
 	e.removeChild(e.firstChild);
 	}
 }
-//$id=
-//$cn=
+
+getId=function(id){
+	return document.getElementById(id);
+}
+
+getCn=function(cn){
+	return document.getElementsByClassName(cn);
+}
+
 var page=/\/coupon\/check\.html|\/detail\/|\/list\//.exec(location.pathname);
 switch (page[0]){
 	case '/list/':
 		list.init();
-		fav.addMaker();
+		fav.init();
 		break;
 	case '/coupon/check.html':
 		wish.init();
 		break;
 	case '/detail/':
 		detail.init();
-		fav.addMaker();
+		fav.init();
 		break;
 }
-//})();
