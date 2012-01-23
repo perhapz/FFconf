@@ -295,29 +295,53 @@ var wish={
 };
 var fav={
 	init:function(){
+		GM_addStyle(' \
+			#header .hd-lnav ul li ul li {position: relative;top:-4em;margin:0;background-color:#242424} \
+			#header .hd-lnav ul li ul {display:none; position:absolute;} \
+			#header .hd-lnav ul li>ul {top: auto;left: auto;} \
+			#header .hd-lnav ul li:hover ul {display:block}'
+		);
 		this.addMaker();
 		this.addLink();
 	},
 	addMaker:function(){
-		function Maker(name,id){
+		function Menu(name,id){
 			this.name=name;
 			this.id=id;
 		}
 		var maker=new Array();
-		maker[0]=new Maker('Moodyz',1509);
-		maker[1]=new Maker('SOD',45276);
-		maker[2]=new Maker('IP',1219);
-		maker[3]=new Maker('S1',3152);
-		maker[4]=new Maker('Prestige',40136);
-		maker[5]=new Maker('EBODY',5032);
-		var navBar = getCn("hd-lnav group")[0].firstElementChild;
-		for (var i = 0; i < maker.length; i++){
-			var li=document.createElement('li');
-			var makerLink=document.createElement('a');
-			makerLink.href='/mono/dvd/-/list/=/article=maker/id='+maker[i].id+'/sort=date/';
-			makerLink.appendChild(document.createTextNode(maker[i].name));
-			li.appendChild(makerLink);
-			navBar.appendChild(li);
+		maker[0]=new Menu('Moodyz',1509);
+		maker[1]=new Menu('SOD',45276);
+		maker[2]=new Menu('IP',1219);
+		maker[3]=new Menu('S1',3152);
+		maker[4]=new Menu('Prestige',40136);
+		maker[5]=new Menu('EBODY',5032);
+		createMenu('Maker','maker',maker)
+		var genre=new Array();
+		genre[0]=new Menu('Titjob',5019)
+		genre[1]=new Menu('Blowjob',5002)
+		genre[2]=new Menu('Handjob',5004)
+		genre[3]=new Menu('Cum inside',5001)
+		genre[4]=new Menu('Cum on face',5023)
+		createMenu('Genre','keyword',genre)
+		function createMenu(menu,name,menuArr){
+			var navBar = getCn("hd-lnav group")[0].firstElementChild;
+			var liMenu=document.createElement('li');
+			var aMenu=document.createElement('a');
+			aMenu.href='/mono/dvd/-/'+menu.toLowerCase()+'/';
+			aMenu.appendChild(document.createTextNode(menu));
+			liMenu.appendChild(aMenu);
+			var ulMenu=document.createElement('ul');
+			liMenu.appendChild(ulMenu);
+			navBar.appendChild(liMenu);
+			for (var i = 0; i < menuArr.length; i++){
+				var liSubmenu=document.createElement('li');
+				var aSubmenu=document.createElement('a');
+				aSubmenu.href='/mono/dvd/-/list/=/article='+name+'/id='+menuArr[i].id+'/sort=date/';
+				aSubmenu.appendChild(document.createTextNode(menuArr[i].name));
+				liSubmenu.appendChild(aSubmenu);
+				ulMenu.appendChild(liSubmenu);
+			}
 		}
 	},
 	addLink:function(){
@@ -327,7 +351,7 @@ var fav={
 		wishLink.style.marginLeft='5px';
 		var key=getCn('popular-keyword')[0];
 		key.appendChild(wishLink);
-		key.style.right='-45px';
+		key.style.right='-3em';
 	}
 }
 
