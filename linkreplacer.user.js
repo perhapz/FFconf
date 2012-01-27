@@ -15,7 +15,7 @@ for (var i=0;i<link.length;i++){
 	if(/http:\/\/(www\.)?(alabout|alafs)\.com\/j\.phtml\?url=/.test(link[i].href)){
 		link[i].href=link[i].textContent;
 	}
-	var site=/mrjh\.org|pics\.dmm\.co\.jp|imgchili\.com|imageporter\.com|imagecarry\.com|imagedunk\.com|picleet\.com|picturedip\.com|imagetwist\.com/i.exec(link[i].href);
+	var site=/mrjh\.org|pics\.dmm\.co\.jp|imgchili\.com|imageporter\.com|imagecarry\.com|imagedunk\.com|picleet\.com|picturedip\.com|piclambo\.net|imagetwist\.com/i.exec(link[i].href);
 	//prestige\.shard\.jp|image\.prestige-av\.com|slide\.com|picshare\.eu
 	if(site){
 		switch (site[0]) {
@@ -39,6 +39,7 @@ for (var i=0;i<link.length;i++){
 			case 'imagedunk.com':
 			case 'picleet.com':
 			case 'picturedip.com':
+			case 'piclambo.net':
 			case 'imagetwist.com':
 			//case 'picshare.eu':
 				link[i].name='plink';
