@@ -2,6 +2,7 @@
 // @name           LinkReplacer
 // @namespace      null
 // @description    Replace link with image for freedl.org
+// @version        1.0.1
 // @include        http://www.freedl.org/*
 // @include        http://www.alabout.com/*
 // ==/UserScript==
