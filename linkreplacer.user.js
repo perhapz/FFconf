@@ -2,7 +2,7 @@
 // @name           LinkReplacer
 // @namespace      null
 // @description    Replace link with image for freedl.org
-// @version        1.0.1
+// @version        1.0.2
 // @include        http://www.freedl.org/*
 // @include        http://www.alabout.com/*
 // ==/UserScript==
@@ -71,11 +71,15 @@ function requestPic(){
 		onload: function(response) {
 			var src=response.responseText.match(/http:\/\/(img\d\d|i[123]\.imgchili|img\d|picshare\.eu\/data)[^"\s]+/); //http://img52.imageporter.com/i/00297/49x4s6jbrku8.jpg" id="looz1oo"http://picshare.eu/data/IMG
 			img=document.createElement('img');
-			img.src=src[0];
-			link.href=img.src;
-			link.removeChild(link.firstChild);
-			link.appendChild(img);
-		}
+			if(src){
+				img.src=src[0];
+				link.href=img.src;
+				link.removeChild(link.firstChild);
+				link.appendChild(img);
+			}
+			else{link.addEventListener('mouseover',requestPic,false);}
+		},
+		onerror: function(){link.addEventListener('mouseover',requestPic,false);}
 	});
 }
 
@@ -83,6 +87,9 @@ function preLoad(){
 	var plink=document.getElementsByName('plink');
 	for (var i=0;i<plink.length;i++){
 		if(plink[i].previousSibling==null||plink[i].previousSibling.previousSibling.name!='plink'){
+			if(plink[i].previousElementSibling.previousElementSibling&&plink[i].previousElementSibling.previousElementSibling.previousElementSibling&&plink[i].nextElementSibling&&plink[i].nextElementSibling.nextElementSibling){
+				if(plink[i].previousElementSibling.previousElementSibling.previousElementSibling.name=='plink'&&plink[i].nextElementSibling.nextElementSibling.name=='plink'){continue;}
+			}
 			var evt=document.createEvent('MouseEvents');
 			evt.initEvent( 'mouseover', true, false );
             plink[i].dispatchEvent(evt);
