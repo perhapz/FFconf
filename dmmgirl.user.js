@@ -2,13 +2,13 @@
 // @name           DMMGirl
 // @namespace      null
 // @description    DMM.R18/mono/dvd tweak for non-member: show big cover, preload sample picture, local wishlist, remove member functions...
-// @version        1.0.1
+// @version        1.0.2
+// @updateURL      https://userscripts.org/scripts/source/123770.meta.js
 // @include        http://www.dmm.co.jp/mono/dvd/-/list/*
 // @include        http://www.dmm.co.jp/coupon/check.html/=/navi=none/*
 // @include        http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=*
 // ==/UserScript==
 var detail = {
-  max: 10,
   init: function () {
     this.replaceRcolumn();
     this.showCover();
@@ -21,85 +21,33 @@ var detail = {
       var link = document.createElement('input');
       link.type = "radio";
       link.id = "prelink";
-      link.addEventListener("click", this.evtPreloadSample, false);
+      link.addEventListener("click", this.onPreloadSample, false);
       headline.appendChild(link);
       headline.appendChild(document.createTextNode("Preload "));
     }
   },
   //==Preload previews==
-  evtPreloadSample: function () {
-    this.removeEventListener('click', detail.evtPreloadSample, false);
+  onPreloadSample: function () {
+    this.removeEventListener('click', detail.onPreloadSample, false);
     var sample = getCn('mg-b6');
     var i = 0;
-    detail.max = sample.length;
     var block = getId("sample-image-block");
     var newblock = document.createElement('div');
     if (sample[0].tagName === "DIV") {
       i = 1;
-      detail.max--;
     }
     for (i; i < sample.length; i++) {
       var pic = document.createElement('img');
       pic.src = sample[i].src.replace('-', 'jp-');
       pic.height = 73;
       pic.style.border = '2px solid white';
-      pic.addEventListener('click', detail.evtShowPic, false);
+      pic.className = 'galpic'
+      pic.addEventListener('click', gal.onShowPic, false);
       newblock.appendChild(pic);
     }
     block.parentNode.replaceChild(newblock, block);
   },
-  //==Show preview gallery==
-  evtShowPic: function () {
-    var origin = new Image();
-    origin.src = this.src;
-    var div = document.createElement('div');
-    var background = document.createElement('div');
-    background.setAttribute('style', 'position:fixed; height:100%; width:100%; left:0; top:0; background-color:black; opacity:0.8;z-index:20');
-    background.addEventListener("click", function () {
-      document.body.removeChild(div);
-    }, true);
-    var box = document.createElement('div');
-    box.id = 'box';
-    box.style.position = 'absolute';
-    box.style.left = window.pageXOffset + (window.innerWidth - origin.width) / 2 + 'px';
-    box.style.top = window.pageYOffset + (window.innerHeight - origin.height) / 2 + 'px';
-    box.style.zIndex = 21;
-    var leftd = document.createElement('div');
-    leftd.id = 'leftd';
-    leftd.setAttribute('style', 'position:absolute; left:0; top:0; height:100%; width:50%');
-    leftd.addEventListener("click", detail.evtShowNext, true);
-    var rightd = document.createElement('div');
-    rightd.id = 'rightd';
-    rightd.setAttribute('style', 'position:absolute; right:0; top:0; height:100%; width:50%');
-    rightd.addEventListener("click", detail.evtShowNext, true);
-    box.appendChild(origin);
-    box.appendChild(leftd);
-    box.appendChild(rightd);
-    div.appendChild(background);
-    div.appendChild(box);
-    document.body.appendChild(div);
-  },
-  //==Show next preview==
-  evtShowNext: function () {
-    var box = this.parentNode;
-    var curpic = box.firstChild;
-    var num = -1;
-    if (this.id === 'leftd') {
-      num = 1;
-    }
-    nextnum = curpic.src.match(/jp-[0-9]+/)[0].replace('jp-', '') - num;
-    if (nextnum <= detail.max && nextnum > 0) {
-      nextnum = 'jp-' + nextnum;
-      var nextpic = new Image();
-      nextpic.src = curpic.src.replace(/jp-[0-9]+/, nextnum);
-      box.style.left = window.pageXOffset + (window.innerWidth - nextpic.width) / 2 + 'px';
-      box.style.top = window.pageYOffset + (window.innerHeight - nextpic.height) / 2 + 'px';
-      box.replaceChild(nextpic, curpic);
-    }
-    else {
-      document.body.removeChild(box.parentNode);
-    }
-  },
+
   //==Show big cover==
   showCover: function () {
     var sample = getCn('float-l mg-b20 mg-r12')[0];
@@ -135,7 +83,7 @@ var detail = {
     var add = document.createElement('a');
     add.href = '#';
     add.appendChild(document.createTextNode('Add to Wishlist'));
-    add.addEventListener("click", this.evtAddWish, false);
+    add.addEventListener("click", this.onAddWish, false);
     var view = document.createElement('a');
     view.href = 'http://www.dmm.co.jp/coupon/check.html/=/navi=none/';
     view.appendChild(document.createTextNode('View Wishlist'));
@@ -151,7 +99,7 @@ var detail = {
     rcolumn.appendChild(actress);
   },
   //==Add to wishlist==
-  evtAddWish: function () {
+  onAddWish: function () {
     var field = document.getElementsByTagName('td');
     var date;
     for (var i = 0; i < field.length; i++) { //get date
@@ -160,13 +108,12 @@ var detail = {
         break;
       }
     }
-    i += 4; //get actress
-    var actress = field[i];
-    i += 6; //get maker
-    var maker = field[i];
+    var actress = field[i + 4];
+    var maker = field[i + 10];
+    var cid  = field[i + 16].innerHTML
     var title = getId('title'); //get title
     var detail = date.innerHTML + '#' + actress.innerHTML + '#' + maker.innerHTML + '#' + title.innerHTML;
-    localStorage.setItem(getCid(location.pathname), detail);
+    localStorage.setItem(cid, detail);
   }
 
 
@@ -175,19 +122,19 @@ var list = {
   init: function () {
     var smallThumb = getCn("mg-r6");
     for (var i = 0; i < smallThumb.length; i++) {
-      smallThumb[i].addEventListener("mouseover", this.evtShowThumb, false);
+      smallThumb[i].addEventListener("mouseover", this.onShowThumb, false);
     }
     var thumb = new Image();
     thumb.id = 'hoverpic';
     thumb.style.position = 'absolute';
     thumb.style.zIndex = 22;
     thumb.style.display = 'none';
-    thumb.addEventListener("mouseout", this.evtRemoveThumb, false);
+    thumb.addEventListener("mouseout", this.onRemoveThumb, false);
     var a = document.createElement('a');
     a.appendChild(thumb);
     document.body.appendChild(a);
   },
-  evtShowThumb: function () {
+  onShowThumb: function () {
     if (this.src.search('noimage') === -1) {
       var thumb = getId('hoverpic');
       thumb.src = this.src.replace("pt.jpg", "ps.jpg");
@@ -197,10 +144,10 @@ var list = {
       thumb.width = 147;
       thumb.height = 200;
       thumb.style.display = 'block';
-      thumb.parentNode.href = 'http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + getCid(this.src) + '/';
+      thumb.parentNode.href = 'http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + getCid(this.src).replace(/so$/,'') + '/';
     }
   },
-  evtRemoveThumb: function () {
+  onRemoveThumb: function () {
     this.style.display = 'none';
     this.src = null;
     this.parentNode.href = null;
@@ -239,7 +186,7 @@ var wish = {
     this.createObj();
     this.fillTable();
   },
-  evtSort: function () {
+  onSort: function () {
     for (var i = 0; i < 4; i++) {
       getId(wish.sortType[i]).style.backgroundColor = '#242424';
     }
@@ -270,12 +217,6 @@ var wish = {
       this.maker = maker;
       this.title = title;
     }
-    Dvd.prototype.cid2 = function () {
-      if (this.cid.match(/^15/)) {
-        return this.cid + 'so';
-      }
-      else return this.cid;
-    };
     for (var i = 0; i < localStorage.length; i++) {
       var cid = localStorage.key(i);
       var info = localStorage[cid].split('#'); //Date[0]#Actress[1]#Maker[2]#Title[3]
@@ -286,7 +227,7 @@ var wish = {
   },
   fillTable: function () {
     for (var i = 0; i < 4; i++) {
-      getId(this.sortType[i]).addEventListener("click", this.evtSort, false);
+      getId(this.sortType[i]).addEventListener("click", this.onSort, false);
     }
     var list = getId('wishlist');
     removeChildren(list);
@@ -294,8 +235,8 @@ var wish = {
       var item = document.createElement('tr');
       item.innerHTML = ' \
         <td height="130">' + (i + 1) + '</td> \
-        <td><img src="http://pics.dmm.co.jp/mono/movie/' + this.dvd[i].cid2() + '/' + this.dvd[i].cid2() + 'pt.jpg" /></td> \
-        <td><a href="http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + this.dvd[i].cid + '/">' + this.dvd[i].cid + '<br /></a><p>' + this.dvd[i].title + '</p></td> \
+        <td><img src="http://pics.dmm.co.jp/mono/movie/' + this.dvd[i].cid + '/' + this.dvd[i].cid + 'pt.jpg" /></td> \
+        <td><a href="http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + this.dvd[i].cid.replace(/so$/,'') + '/">' + this.dvd[i].cid + '<br /></a><p>' + this.dvd[i].title + '</p></td> \
         <td>' + this.dvd[i].actress + '</td> \
         <td name="maker">' + this.dvd[i].maker + '</td> \
         <td>' + this.dvd[i].date + '</td> \
@@ -367,13 +308,67 @@ var fav = {
   }
 };
 
+var gal = {
+  //==Show preview gallery==
+  onShowPic: function () {
+    var origin = new Image();
+    origin.src = this.src;
+    var div = document.createElement('div');
+    var background = document.createElement('div');
+    background.setAttribute('style', 'position:fixed; height:100%; width:100%; left:0; top:0; background-color:black; opacity:0.8;z-index:20');
+    background.addEventListener("click", function () {
+      document.body.removeChild(div);
+    }, true);
+    var box = document.createElement('div');
+    box.id = 'box';
+    box.style.position = 'absolute';
+    box.style.left = window.pageXOffset + (window.innerWidth - origin.width) / 2 + 'px';
+    box.style.top = window.pageYOffset + (window.innerHeight - origin.height) / 2 + 'px';
+    box.style.zIndex = 21;
+    var leftd = document.createElement('div');
+    leftd.id = 'leftd';
+    leftd.setAttribute('style', 'position:absolute; left:0; top:0; height:100%; width:50%');
+    leftd.addEventListener("click", gal.onShowNext, true);
+    var rightd = document.createElement('div');
+    rightd.id = 'rightd';
+    rightd.setAttribute('style', 'position:absolute; right:0; top:0; height:100%; width:50%');
+    rightd.addEventListener("click", gal.onShowNext, true);
+    box.appendChild(origin);
+    box.appendChild(leftd);
+    box.appendChild(rightd);
+    div.appendChild(background);
+    div.appendChild(box);
+    document.body.appendChild(div);
+  },
+  //==Show next preview==
+  onShowNext: function () {
+    var box = this.parentNode;
+    var curpic = box.firstChild;
+    var gal = getCn('galpic').length;
+    var num = 1;
+    if (this.id === 'leftd') {
+      num = -1;
+    }
+    var patt = /\d+(?=\.jpg$)/;
+    patt.compile(patt);
+    nextnum = parseInt(curpic.src.match(patt)[0]) + num;
+    if (nextnum <= gal && nextnum > 0) {
+      var nextpic = new Image();
+      nextpic.src = curpic.src.replace(patt, nextnum);
+      box.style.left = window.pageXOffset + (window.innerWidth - nextpic.width) / 2 + 'px';
+      box.style.top = window.pageYOffset + (window.innerHeight - nextpic.height) / 2 + 'px';
+      box.insertBefore(nextpic, curpic);
+      box.removeChild(curpic);
+    }
+    else {
+      document.body.removeChild(box.parentNode);
+    }
+  },
+};
 //Get cid of the dvd.
 getCid = function (str) {
-  var patt1 = /cid=[^\/#]+|[^\/]+pt\.jpg$/;
-  var patt2 = /^cid=|pt\.jpg$|sopt\.jpg$/;
-  var cid = str.match(patt1);
-  cid = cid[0].replace(patt2, '');
-  return cid;
+  var cid = str.match(/\w+\d+(?:so)?/);
+  return cid[0];
 };
 
 removeChildren = function (e) {

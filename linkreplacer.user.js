@@ -12,11 +12,15 @@ box.type = "checkbox";
 box.addEventListener('click', preLoad, false);
 document.body.insertBefore(box, document.body.firstChild);
 var link = document.getElementsByTagName('a');
+pattLink = /http:\/\/(www\.)?(alabout|alafs)\.com\/j\.phtml\?url=/;
+pattLink.compile(pattLink);
+pattSite = /mrjh\.org|pics\.dmm\.co\.jp|imgchili\.com|imageporter\.com|imagecarry\.com|imagedunk\.com|picleet\.com|picturedip\.com|piclambo\.net|imagetwist\.com|imagehyper\.com/i
+pattSite.compile(pattSite);
 for (var i = 0; i < link.length; i++) {
-  if (/http:\/\/(www\.)?(alabout|alafs)\.com\/j\.phtml\?url=/.test(link[i].href)) {
+  if (pattLink.test(link[i].href)) {
     link[i].href = link[i].textContent;
   }
-  var site = /mrjh\.org|pics\.dmm\.co\.jp|imgchili\.com|imageporter\.com|imagecarry\.com|imagedunk\.com|picleet\.com|picturedip\.com|piclambo\.net|imagetwist\.com|imagehyper\.com/i.exec(link[i].href);
+  var site = pattSite.exec(link[i].href);
   //prestige\.shard\.jp|image\.prestige-av\.com|slide\.com|picshare\.eu
   if (site) {
     switch (site[0]) {

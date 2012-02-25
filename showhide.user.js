@@ -12,5 +12,5 @@ var attach = document.getElementsByClassName('postattachlist')[0];
 if (hide) {
   var title = document.getElementById('threadtitle');
   title.appendChild(hide);
-  title.appendChild(hide);
+  title.appendChild(attach);
 }
