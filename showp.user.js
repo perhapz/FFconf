@@ -2,6 +2,8 @@
 // @name           ShowP
 // @namespace      null
 // @description    Show big preview pictures for carib
+// @version        1.0.0
+// @updateURL      https://raw.github.com/perhapz/FFconf/master/showp.user.js
 // @include        http://www.caribbeancom.com/moviepages/*
 // ==/UserScript==
 var id = location.pathname.replace('index.html', 'images/');

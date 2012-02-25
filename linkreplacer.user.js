@@ -2,7 +2,7 @@
 // @name           LinkReplacer
 // @namespace      null
 // @description    Replace link with image for freedl.org
-// @version        1.0.3
+// @version        1.0.4
 // @updateURL      https://raw.github.com/perhapz/FFconf/master/linkreplacer.user.js
 // @include        http://www.freedl.org/*
 // @include        http://www.alabout.com/*
@@ -24,14 +24,10 @@ for (var i = 0; i < link.length; i++) {
       link[i].href = link[i].href.replace('gallery.php?entry=', '');
       fixLink(link[i]);
       break;
-      // case 'imgchili.com':
-      // link[i].href=link[i].href.replace('imgchili.com/show','i2.imgchili.com');//bug:i2
-      // fixLink(link[i]);
-      // break;
     case 'pics.dmm.co.jp':
-      //case 'prestige.shard.jp':
-      //case 'image.prestige-av.com':
-      //case 'slide.com':
+    //case 'prestige.shard.jp':
+    //case 'image.prestige-av.com':
+    //case 'slide.com':
       fixLink(link[i]);
       break;
     case 'imgchili.com':
@@ -42,7 +38,8 @@ for (var i = 0; i < link.length; i++) {
     case 'picturedip.com':
     case 'piclambo.net':
     case 'imagetwist.com':
-      //case 'picshare.eu':
+    case 'imagehyper.com'
+    //case 'picshare.eu':
       link[i].name = 'plink';
       link[i].addEventListener('mouseover', requestPic, false);
       break;
