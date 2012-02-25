@@ -38,7 +38,7 @@ for (var i = 0; i < link.length; i++) {
     case 'picturedip.com':
     case 'piclambo.net':
     case 'imagetwist.com':
-    case 'imagehyper.com'
+    case 'imagehyper.com':
     //case 'picshare.eu':
       link[i].name = 'plink';
       link[i].addEventListener('mouseover', requestPic, false);
