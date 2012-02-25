@@ -3,6 +3,7 @@
 // @namespace      null
 // @description    Replace link with image for freedl.org
 // @version        1.0.3
+// @updateURL      https://raw.github.com/perhapz/FFconf/master/linkreplacer.user.js
 // @include        http://www.freedl.org/*
 // @include        http://www.alabout.com/*
 // ==/UserScript==
