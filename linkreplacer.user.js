@@ -12,9 +12,9 @@ box.type = "checkbox";
 box.addEventListener('click', preLoad, false);
 document.body.insertBefore(box, document.body.firstChild);
 var link = document.getElementsByTagName('a');
-pattLink = /http:\/\/(www\.)?(alabout|alafs)\.com\/j\.phtml\?url=/;
+var pattLink = /http:\/\/(www\.)?(alabout|alafs)\.com\/j\.phtml\?url=/;
 pattLink.compile(pattLink);
-pattSite = /mrjh\.org|pics\.dmm\.co\.jp|imgchili\.com|imageporter\.com|imagecarry\.com|imagedunk\.com|picleet\.com|picturedip\.com|piclambo\.net|imagetwist\.com|imagehyper\.com/i
+var pattSite = /mrjh\.org|pics\.dmm\.co\.jp|imgchili\.com|imageporter\.com|imagecarry\.com|imagedunk\.com|picleet\.com|picturedip\.com|piclambo\.net|imagetwist\.com|imagehyper\.com/i;
 pattSite.compile(pattSite);
 for (var i = 0; i < link.length; i++) {
   if (pattLink.test(link[i].href)) {
@@ -59,7 +59,7 @@ function fixLink(a) {
 function loadPic() {
   var link = this;
   link.removeEventListener('mouseover', loadPic, false);
-  img = document.createElement('img');
+  var img = document.createElement('img');
   img.src = link.href;
   link.removeChild(link.firstChild);
   link.appendChild(img);
@@ -73,7 +73,7 @@ function requestPic() {
     url: link.href,
     onload: function (response) {
       var src = response.responseText.match(/http:\/\/(img\d\d|i[123]\.imgchili|img\d|picshare\.eu\/data)[^"\s]+/); //http://img52.imageporter.com/i/00297/49x4s6jbrku8.jpg" id="looz1oo"http://picshare.eu/data/IMG
-      img = document.createElement('img');
+      var img = document.createElement('img');
       if (src) {
         img.src = src[0];
         link.href = img.src;
@@ -95,7 +95,7 @@ function preLoad() {
   for (var i = 0; i < plink.length; i++) {
     if (plink[i].previousSibling === null || plink[i].previousSibling.previousSibling.name !== 'plink') {
       if (plink[i].previousElementSibling.previousElementSibling && plink[i].previousElementSibling.previousElementSibling.previousElementSibling && plink[i].nextElementSibling && plink[i].nextElementSibling.nextElementSibling) {
-        if (plink[i].previousElementSibling.previousElementSibling.previousElementSibling.name === 'plink' && plink[i].nextElementSibling.nextElementSibling.name == 'plink') {
+        if (plink[i].previousElementSibling.previousElementSibling.previousElementSibling.name === 'plink' && plink[i].nextElementSibling.nextElementSibling.name === 'plink') {
           continue;
         }
       }

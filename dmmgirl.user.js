@@ -41,7 +41,7 @@ var detail = {
       pic.src = sample[i].src.replace('-', 'jp-');
       pic.height = 73;
       pic.style.border = '2px solid white';
-      pic.className = 'galpic'
+      pic.className = 'galpic';
       pic.addEventListener('click', gal.onShowPic, false);
       newblock.appendChild(pic);
     }
@@ -110,7 +110,7 @@ var detail = {
     }
     var actress = field[i + 4];
     var maker = field[i + 10];
-    var cid  = field[i + 16].innerHTML
+    var cid  = field[i + 16].innerHTML;
     var title = getId('title'); //get title
     var detail = date.innerHTML + '#' + actress.innerHTML + '#' + maker.innerHTML + '#' + title.innerHTML;
     localStorage.setItem(cid, detail);
@@ -351,7 +351,7 @@ var gal = {
     }
     var patt = /\d+(?=\.jpg$)/;
     patt.compile(patt);
-    nextnum = parseInt(curpic.src.match(patt)[0]) + num;
+    var nextnum = parseInt(curpic.src.match(patt)[0], 10) + num;
     if (nextnum <= gal && nextnum > 0) {
       var nextpic = new Image();
       nextpic.src = curpic.src.replace(patt, nextnum);
@@ -363,27 +363,27 @@ var gal = {
     else {
       document.body.removeChild(box.parentNode);
     }
-  },
+  }
 };
 //Get cid of the dvd.
-getCid = function (str) {
+function getCid(str) {
   var cid = str.match(/\w+\d+(?:so)?/);
   return cid[0];
-};
+}
 
-removeChildren = function (e) {
+function removeChildren(e) {
   while (e.firstChild) {
     e.removeChild(e.firstChild);
   }
-};
+}
 
-getId = function (id) {
+function getId(id) {
   return document.getElementById(id);
-};
+}
 
-getCn = function (cn) {
+function getCn(cn) {
   return document.getElementsByClassName(cn);
-};
+}
 
 var page = /\/coupon\/check\.html|\/detail\/|\/list\//.exec(location.pathname);
 switch (page[0]) {
