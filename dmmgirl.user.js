@@ -2,10 +2,10 @@
 // @name           DMMGirl
 // @namespace      null
 // @description    DMM.R18/mono/dvd tweak for non-member: show big cover, preload sample picture, local wishlist, remove member functions...
-// @version        1.0.2
+// @version        1.0.3
 // @updateURL      https://userscripts.org/scripts/source/123770.meta.js
 // @include        http://www.dmm.co.jp/mono/dvd/-/list/*
-// @include        http://www.dmm.co.jp/coupon/check.html/=/navi=none/*
+// @include        http://www.dmm.co.jp/error/-/area/=/navi=none/*
 // @include        http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=*
 // ==/UserScript==
 var detail = {
@@ -85,7 +85,7 @@ var detail = {
     add.appendChild(document.createTextNode('Add to Wishlist'));
     add.addEventListener("click", this.onAddWish, false);
     var view = document.createElement('a');
-    view.href = 'http://www.dmm.co.jp/coupon/check.html/=/navi=none/';
+    view.href = 'http://www.dmm.co.jp/error/-/area/=/navi=none/';
     view.appendChild(document.createTextNode('View Wishlist'));
     div.appendChild(add);
     div.appendChild(document.createElement('br'));
@@ -299,7 +299,7 @@ var fav = {
   },
   addLink: function () {
     var wishLink = document.createElement('a');
-    wishLink.href = 'http://www.dmm.co.jp/coupon/check.html/=/navi=none/';
+    wishLink.href = 'http://www.dmm.co.jp/error/-/area/=/navi=none/';
     wishLink.appendChild(document.createTextNode('Wishlist'));
     wishLink.style.marginLeft = '5px';
     var key = getCn('popular-keyword')[0];
@@ -385,13 +385,13 @@ function getCn(cn) {
   return document.getElementsByClassName(cn);
 }
 
-var page = /\/coupon\/check\.html|\/detail\/|\/list\//.exec(location.pathname);
+var page = /\/error\/-\/area\/=|\/detail\/|\/list\//.exec(location.pathname);
 switch (page[0]) {
 case '/list/':
   list.init();
   fav.init();
   break;
-case '/coupon/check.html':
+case '/error/-/area/=':
   wish.init();
   break;
 case '/detail/':
