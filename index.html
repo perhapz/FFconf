@@ -8,8 +8,9 @@
 <script type="text/javascript" src="wmvplayer.js"></script>
 
 <div id="myplayer"></div>
-	
-	<script type="text/javascript">
+<input type="text" style="width: 368px" id='uri'/>
+<input type="button" value="Sumbit" onclick="play()"/>	
+	<script type="text/javascript" style="width:440;height:240">
 		var elm = document.getElementById("myplayer");
 		var src = 'wmvplayer.xaml';
 		var cfg = {
@@ -18,6 +19,11 @@
 			height:'360'
 		};
 		var ply = new jeroenwijering.Player(elm,src,cfg);
+		function play(){
+			ply.configuration.file=document.getElementById('uri').value
+		}
 	</script>
+	
+
 </body>
 </html>
