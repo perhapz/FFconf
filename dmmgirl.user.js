@@ -2,7 +2,7 @@
 // @name           DMMGirl
 // @namespace      null
 // @description    DMM.R18/mono/dvd tweak for non-member: show big cover, preload sample picture, local wishlist, remove member functions...
-// @version        1.0.3
+// @version        1.0.4
 // @updateURL      https://userscripts.org/scripts/source/123770.meta.js
 // @include        http://www.dmm.co.jp/mono/dvd/-/list/*
 // @include        http://www.dmm.co.jp/error/-/area/=/navi=none/*
@@ -74,11 +74,18 @@ var detail = {
       }
       review.parentNode.parentNode.removeChild(review.parentNode);
     }
+    var box = getCn('bx-option mg-t20')[0];
+    if (box) {
+      box.parentNode.removeChild(box);
+    }
+    var tag = getId('producttag');
+    tag.parentNode.removeChild(tag);
     var desc = info.nextElementSibling.nextElementSibling;
     var another = getCn('another')[0];
     var actress = getId('avcast_text');
     removeChildren(rcolumn);
     var div = document.createElement('div');
+    div.id = 'mybox';
     div.setAttribute('style', 'font-size:1.2em;font-weight:bold;background-color:#F7FDFF;border:1px solid #CCCCCC;padding: 5px;margin-bottom:20px;');
     var add = document.createElement('a');
     add.href = '#';
@@ -90,6 +97,7 @@ var detail = {
     div.appendChild(add);
     div.appendChild(document.createElement('br'));
     div.appendChild(view);
+    div.appendChild(document.createElement('br'));
     rcolumn.appendChild(div);
     rcolumn.appendChild(info);
     rcolumn.appendChild(desc);
@@ -100,17 +108,11 @@ var detail = {
   },
   //==Add to wishlist==
   onAddWish: function () {
-    var field = document.getElementsByTagName('td');
-    var date;
-    for (var i = 0; i < field.length; i++) { //get date
-      if (field[i].width === '100%') {
-        date = field[i];
-        break;
-      }
-    }
-    var actress = field[i + 4];
-    var maker = field[i + 10];
-    var cid  = field[i + 16].innerHTML;
+    var tds = getCn('nw'); //[date,length,actress,director,series,maker,label,genre,cid]
+    var date = tds[0].nextElementSibling;
+    var actress = tds[2].nextElementSibling;
+    var maker = tds[5].nextElementSibling;
+    var cid = tds[8].nextElementSibling.innerHTML;
     var title = getId('title'); //get title
     var detail = date.innerHTML + '#' + actress.innerHTML + '#' + maker.innerHTML + '#' + title.innerHTML;
     localStorage.setItem(cid, detail);
@@ -144,7 +146,7 @@ var list = {
       thumb.width = 147;
       thumb.height = 200;
       thumb.style.display = 'block';
-      thumb.parentNode.href = 'http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + getCid(this.src).replace(/so$/,'') + '/';
+      thumb.parentNode.href = 'http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + getCid(this.src).replace(/so$/, '') + '/';
     }
   },
   onRemoveThumb: function () {
@@ -236,7 +238,7 @@ var wish = {
       item.innerHTML = ' \
         <td height="130">' + (i + 1) + '</td> \
         <td><img src="http://pics.dmm.co.jp/mono/movie/' + this.dvd[i].cid + '/' + this.dvd[i].cid + 'pt.jpg" /></td> \
-        <td><a href="http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + this.dvd[i].cid.replace(/so$/,'') + '/">' + this.dvd[i].cid + '<br /></a><p>' + this.dvd[i].title + '</p></td> \
+        <td><a href="http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + this.dvd[i].cid.replace(/so$/, '') + '/">' + this.dvd[i].cid + '<br /></a><p>' + this.dvd[i].title + '</p></td> \
         <td>' + this.dvd[i].actress + '</td> \
         <td name="maker">' + this.dvd[i].maker + '</td> \
         <td>' + this.dvd[i].date + '</td> \
@@ -309,10 +311,7 @@ var fav = {
 };
 
 var gal = {
-  //==Show preview gallery==
-  onShowPic: function () {
-    var origin = new Image();
-    origin.src = this.src;
+  init: function (e, width, height) {
     var div = document.createElement('div');
     var background = document.createElement('div');
     background.setAttribute('style', 'position:fixed; height:100%; width:100%; left:0; top:0; background-color:black; opacity:0.8;z-index:20');
@@ -322,9 +321,18 @@ var gal = {
     var box = document.createElement('div');
     box.id = 'box';
     box.style.position = 'absolute';
-    box.style.left = window.pageXOffset + (window.innerWidth - origin.width) / 2 + 'px';
-    box.style.top = window.pageYOffset + (window.innerHeight - origin.height) / 2 + 'px';
+    box.style.left = window.pageXOffset + (window.innerWidth - width) / 2 + 'px';
+    box.style.top = window.pageYOffset + (window.innerHeight - height) / 2 + 'px';
     box.style.zIndex = 21;
+    document.body.appendChild(div);
+    div.appendChild(background);
+    div.appendChild(box);
+    box.appendChild(e);
+  },
+  //==Show preview gallery==
+  onShowPic: function () {
+    var origin = new Image();
+    origin.src = this.src;
     var leftd = document.createElement('div');
     leftd.id = 'leftd';
     leftd.setAttribute('style', 'position:absolute; left:0; top:0; height:100%; width:50%');
@@ -333,12 +341,11 @@ var gal = {
     rightd.id = 'rightd';
     rightd.setAttribute('style', 'position:absolute; right:0; top:0; height:100%; width:50%');
     rightd.addEventListener("click", gal.onShowNext, true);
-    box.appendChild(origin);
-    box.appendChild(leftd);
-    box.appendChild(rightd);
-    div.appendChild(background);
-    div.appendChild(box);
-    document.body.appendChild(div);
+    var image = document.createElement('div');
+    image.appendChild(origin);
+    image.appendChild(leftd);
+    image.appendChild(rightd);
+    gal.init(image, origin.width, origin.height);
   },
   //==Show next preview==
   onShowNext: function () {
@@ -361,8 +368,112 @@ var gal = {
       box.removeChild(curpic);
     }
     else {
-      document.body.removeChild(box.parentNode);
+      document.body.removeChild(box.parentNode.parentNode);
     }
+  },
+  onPlay: function () {
+    var video = document.createElement('embed');
+    video.width = 640;
+    video.height = 480;
+    video.src = sample.url;
+    gal.init(video, video.width, video.height);
+  }
+};
+var sample = {
+  url: '',
+  sods: [ //sod shop 640x480 http://str.sod.co.jp/201204/star_351/star_351_sample.wmv 
+    'SOD¥¯¥ê¥¨¥¤¥È', //SOD Create 45276
+    '¥Ç¥£©`¥×¥¹', //Deep's 40003
+    '¥Ê¥Á¥å¥é¥ë¥Ï¥¤', //Natural High 40001
+    '¥¢¥¤¥¨¥Ê¥¸©`', //IEnergy 40004
+    '¥Ò¥Ó¥Î', //hibino & switch<97 45277
+    'V£¦R¥×¥í¥À¥¯¥Ä', //V&R Products 45168
+    '¥¢¥­¥Î¥ê', //AKNR 45289
+    'DANDY', //DANDY 45286
+    'LADY¡ÁLADY', //LADYxLADY 45460
+    'Hunter', //Hunter 45287
+    'GARCON', //GARCON 45504
+    '¥µ¥Ç¥£¥¹¥Æ¥£¥Ã¥¯¥ô¥£¥ì¥Ã¥¸', //Sadistic Village 45356
+    'ROCKET', //ROCKET 45371
+    'AROUND', //AROUND 45562
+    'KEU', //45615
+    'ATOM', //45758
+    'SWITCH', //>96 45914
+    'F£¦A', //F&A 45831
+    'new girl', //45887
+    'SILK LABO', //45583
+    '¥¤¥Õ¥ê©`¥È', //ifrit 45290
+    'C£¦H', //C&H 45429
+    '¥Ô¥å¥¢¥Í¥¹¥×¥é¥Í¥Ã¥È', //pureness planet 45453
+    'ÈËég¿¼²ì', //45455
+    '¥·¥å¥¬©`¥ï©`¥¯¥¹' //Sugar Works 40163
+    ],
+  kmps: [ //smm 320x240 http://st0.d-dx.jp/a5942/r1/unsecure/smm2012/0106/MILD-757.wmv
+    //2012/0106 2011/0712 2011/0106 10/0112 09/0112/ 08/0112
+    '¥±¥¤?¥¨¥à?¥×¥í¥Ç¥å©`¥¹', //K.M.Produce: million+¤ª¤«¤º¡£ 40071
+    '¥¹¥¯©`¥×', //Scoop 45837
+    'S¼‰ËØÈË', //45434
+    'ÓîÖæÆó»­', //45858
+    '¥Ð¥º©`¥«£¨BAZOOKA£©', //BAZOOKA 45859
+    '¥ì¥¢¥ë¥ï©`¥¯¥¹', //Real Works 40185
+    '¤Ê¤Ç¤·¤³', //Nadeshiko 45216
+    //also in
+    '¥»¥ó¥¿©`¥Ó¥ì¥Ã¥¸', //centervillage 45016
+    'h.m.p', //40027
+    '¥¯¥ê¥¹¥¿¥ëÓ³Ïñ', //40035
+    '¥ï©`¥×¥¨¥ó¥¿¥Æ¥¤¥ó¥á¥ó¥È', //WAAP ent. 40005
+    '¥É¥ê©`¥à¥Á¥±¥Ã¥È', //dream ticket 40025
+    '¥Þ¥Ã¥¯¥¹¥¨©`', //MAX-A 40046
+    '¥¢¥Ã¥×¥¹', //UP'S 45313
+    '¥Ö¥ê¥Ã¥È', //bullitt 45176
+    '¥Û¥Ã¥È¥¨¥ó¥¿©`¥Æ¥¤¥á¥ó¥È', //hot ent. 40045
+    '¥Þ¥­¥·¥ó¥°', //maxing 45217 only mxgs
+    '¥Ð¥ë¥¿¥ó', //BALTAN 45700
+    '¥ï¥ó¥À¥Õ¥ë£¨ONE DA FULL£©', //45807
+    '¥µ¥à¥·¥ó¥°', //something 45489
+    '¥é¥Þ', //lama 45416
+    'HMJM' //45337
+    ],
+  pres: [ //500x376 http://download.prestige-av.com/sample_movie/ABS-096.wmv
+    '¥×¥ì¥¹¥Æ©`¥¸', //Prestige Fullsail DOC shiroutoTV saikyo magic Zetton onemore avant opus yabusame yabustyle ase digista40136
+    'MAD', //45490
+    '¥é¥¹¥È¥é¥¹' //LUSTROUS 45039
+    //'GALLOP', //GALLOP 45735 no video
+    ],
+  init: function () {
+    var tds = getCn('nw');
+    var maker = tds[5].nextElementSibling.firstChild.innerHTML;
+    var date = tds[0].nextElementSibling.innerHTML;
+    var cid = tds[8].nextElementSibling.innerHTML;
+    var pcid = cid.match(/([a-z]+)([0-9]+)/);
+    var pdate = date.split('/');
+    if (this.sods.indexOf(maker) !== -1) {
+      this.url = 'http://str.sod.co.jp/' + pdate[0] + pdate[1] + '/' + pcid[1] + '_' + pcid[2] + '/' + pcid[1] + '_' + pcid[2] + '_sample.wmv';
+      this.createLink();
+    }
+    else if (this.pres.indexOf(maker) !== -1) {
+      this.url = 'http://download.prestige-av.com/sample_movie/' + pcid[1] + '-' + pcid[2] + '.wmv';
+      this.createLink();
+    }
+    else if (this.kmps.indexOf(maker) !== -1) {
+      var mon = '';
+      if (pdate[0] === '2012' || pdate[0] === '2011') {
+        mon = ((pdate[1] + pdate[2]) < '0701') ? '/0106/' : '/0712/';
+      }
+      else {
+        mon = '/0112/';
+      }
+      this.url = 'http://st0.d-dx.jp/a5942/r1/unsecure/smm' + pdate[0] + mon + pcid[1].toUpperCase() + '-' + pcid[2] + '.wmv';
+      this.createLink();
+    }
+  },
+  createLink: function () {
+    var mybox = getId('mybox');
+    var play = document.createElement('a');
+    play.href = 'javascript:void(0)';
+    play.appendChild(document.createTextNode('Play Sample'));
+    play.addEventListener("click", gal.onPlay, false);
+    mybox.appendChild(play);
   }
 };
 //Get cid of the dvd.
@@ -397,5 +508,6 @@ case '/error/-/area/=':
 case '/detail/':
   detail.init();
   fav.init();
+  sample.init();
   break;
 }

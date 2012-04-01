@@ -2,7 +2,7 @@
 // @name           LinkReplacer
 // @namespace      null
 // @description    Replace link with image for freedl.org
-// @version        1.0.4
+// @version        1.0.5
 // @updateURL      https://raw.github.com/perhapz/FFconf/master/linkreplacer.user.js
 // @include        http://www.freedl.org/*
 // @include        http://www.alabout.com/*
@@ -91,17 +91,18 @@ function requestPic() {
 }
 
 function preLoad() {
-  var plink = document.getElementsByName('plink');
-  for (var i = 0; i < plink.length; i++) {
-    if (plink[i].previousSibling === null || plink[i].previousSibling.previousSibling.name !== 'plink') {
-      if (plink[i].previousElementSibling.previousElementSibling && plink[i].previousElementSibling.previousElementSibling.previousElementSibling && plink[i].nextElementSibling && plink[i].nextElementSibling.nextElementSibling) {
-        if (plink[i].previousElementSibling.previousElementSibling.previousElementSibling.name === 'plink' && plink[i].nextElementSibling.nextElementSibling.name === 'plink') {
-          continue;
-        }
+  var block = document.getElementsByTagName('blockquote');
+  var evt = document.createEvent('MouseEvents');
+  evt.initEvent('mouseover', true, false);
+  for (var i =0; i < block.length; i++) {
+    var plink = block[i].querySelectorAll('a[name="plink"]');
+    if (plink[0]) {
+      plink[0].dispatchEvent(evt);
+    }
+    for (var j = 1; j < plink.length; j++) {
+      if (plink[j].previousSibling.previousSibling.name !== 'plink' && plink[j].nextSibling.nextSibling.name !== 'plink') {
+          plink[j].dispatchEvent(evt);
       }
-      var evt = document.createEvent('MouseEvents');
-      evt.initEvent('mouseover', true, false);
-      plink[i].dispatchEvent(evt);
     }
   }
 }
