@@ -443,7 +443,7 @@ var sample = {
     'HMJM' //45337
     ],
   pres: [ //500x376 http://download.prestige-av.com/sample_movie/ABC-123.wmv
-    '¥×¥ì¥¹¥Æ©`¥¸', //Prestige Fullsail DOC shiroutoTV saikyo magic Zetton onemore avant opus yabusame yabustyle ase digista40136
+    '¥×¥ì¥¹¥Æ©`¥¸', //Prestige: Fullsail DOC shiroutoTV saikyo magic Zetton onemore avant opus yabusame yabustyle ase digista40136
     'MAD', //45490
     '¥é¥¹¥È¥é¥¹' //LUSTROUS 45039
     //'GALLOP', //GALLOP 45735 no video
@@ -505,10 +505,6 @@ function getCn(cn) {
 }
 
 (function(){
-  var welcome = document.getElementById('welcome');
-  if (welcome) {
-    welcome.parentNode.removeChild(welcome);
-  }
   var page = /\/error\/-\/area\/=|\/detail\/|\/list\//.exec(location.pathname);
   switch (page[0]) {
   case '/list/':
