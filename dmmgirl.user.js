@@ -10,6 +10,12 @@
 // ==/UserScript==
 var detail = {
   init: function () {
+    GM_addStyle(' \
+      #mybox {font-size:1.2em; font-weight:bold; background-color:#F7FDFF; border:1px solid #CCCCCC; padding:5px 10px; margin-bottom:20px;} \
+      #mybox a {display:block; color:#005FC0; cursor:pointer; text-decoration:none; padding-left:10px; \
+        background:url("http://p.dmm.co.jp/p/common/arrow_common.gif") no-repeat scroll left center transparent} \
+      #mybox a:active, #mybox a:hover {color:#EE2200 !important; text-decoration:underline !important;} \
+      #mybox a:visited {color:#990099 !important;}');
     this.replaceRcolumn();
     this.showCover();
     this.addPreloadRadio();
@@ -40,7 +46,6 @@ var detail = {
       var pic = document.createElement('img');
       pic.src = sample[i].src.replace('-', 'jp-');
       pic.height = 73;
-      pic.style.border = '2px solid white';
       pic.className = 'galpic';
       pic.addEventListener('click', gal.onShowPic, false);
       newblock.appendChild(pic);
@@ -66,7 +71,7 @@ var detail = {
     if (review) {
       var star = tbody.lastElementChild.lastElementChild;
       var vote = getCn('count')[0];
-      if (vote) {
+      if (vote && star.lastElementChild) {
         star.lastElementChild.innerHTML = '(' + vote.innerHTML + ')';
       }
       else {
@@ -79,25 +84,28 @@ var detail = {
       box.parentNode.removeChild(box);
     }
     var tag = getId('producttag');
-    tag.parentNode.removeChild(tag);
+    if (tag) {
+      tag.parentNode.removeChild(tag);
+    }
     var desc = info.nextElementSibling.nextElementSibling;
     var another = getCn('another')[0];
     var actress = getId('avcast_text');
     removeChildren(rcolumn);
     var div = document.createElement('div');
     div.id = 'mybox';
-    div.setAttribute('style', 'font-size:1.2em;font-weight:bold;background-color:#F7FDFF;border:1px solid #CCCCCC;padding: 5px;margin-bottom:20px;');
     var add = document.createElement('a');
-    add.href = '#';
     add.appendChild(document.createTextNode('Add to Wishlist'));
     add.addEventListener("click", this.onAddWish, false);
     var view = document.createElement('a');
     view.href = 'http://www.dmm.co.jp/error/-/area/=/navi=none/';
     view.appendChild(document.createTextNode('View Wishlist'));
+    var search = document.createElement('a');
+    search.href = 'http://search.supermm.jp/?ad=1&limit=60&o=0&sort=Score&style=1&q=' + getCid(location.pathname, true)[0];
+    search.target = '_blank';
+    search.appendChild(document.createTextNode('Search in SMM'));    
     div.appendChild(add);
-    div.appendChild(document.createElement('br'));
     div.appendChild(view);
-    div.appendChild(document.createElement('br'));
+    div.appendChild(search);
     rcolumn.appendChild(div);
     rcolumn.appendChild(info);
     rcolumn.appendChild(desc);
@@ -146,7 +154,7 @@ var list = {
       thumb.width = 147;
       thumb.height = 200;
       thumb.style.display = 'block';
-      thumb.parentNode.href = 'http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + getCid(this.src).replace(/so$/, '') + '/';
+      thumb.parentNode.href = 'http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + getCid(this.src)[1] + '/';
     }
   },
   onRemoveThumb: function () {
@@ -381,7 +389,7 @@ var gal = {
 };
 var sample = {
   url: '',
-  sods: [ //sod shop 640x480 http://str.sod.co.jp/201204/star_351/star_351_sample.wmv 
+  sods: [ //sod shop 640x480 http://str.sod.co.jp/201204/abcd_123/abcd_123_sample.wmv 
     'SOD¥¯¥ê¥¨¥¤¥È', //SOD Create 45276
     '¥Ç¥£©`¥×¥¹', //Deep's 40003
     '¥Ê¥Á¥å¥é¥ë¥Ï¥¤', //Natural High 40001
@@ -408,7 +416,7 @@ var sample = {
     'ÈËég¿¼²ì', //45455
     '¥·¥å¥¬©`¥ï©`¥¯¥¹' //Sugar Works 40163
     ],
-  kmps: [ //smm 320x240 http://st0.d-dx.jp/a5942/r1/unsecure/smm2012/0106/MILD-757.wmv
+  kmps: [ //smm 320x240 http://st0.d-dx.jp/a5942/r1/unsecure/smm2012/0106/ABCD-123.wmv
     //2012/0106 2011/0712 2011/0106 10/0112 09/0112/ 08/0112
     '¥±¥¤?¥¨¥à?¥×¥í¥Ç¥å©`¥¹', //K.M.Produce: million+¤ª¤«¤º¡£ 40071
     '¥¹¥¯©`¥×', //Scoop 45837
@@ -434,7 +442,7 @@ var sample = {
     '¥é¥Þ', //lama 45416
     'HMJM' //45337
     ],
-  pres: [ //500x376 http://download.prestige-av.com/sample_movie/ABS-096.wmv
+  pres: [ //500x376 http://download.prestige-av.com/sample_movie/ABC-123.wmv
     '¥×¥ì¥¹¥Æ©`¥¸', //Prestige Fullsail DOC shiroutoTV saikyo magic Zetton onemore avant opus yabusame yabustyle ase digista40136
     'MAD', //45490
     '¥é¥¹¥È¥é¥¹' //LUSTROUS 45039
@@ -445,7 +453,7 @@ var sample = {
     var maker = tds[5].nextElementSibling.firstChild.innerHTML;
     var date = tds[0].nextElementSibling.innerHTML;
     var cid = tds[8].nextElementSibling.innerHTML;
-    var pcid = cid.match(/([a-z]+)([0-9]+)/);
+    var pcid = getCid(cid, true);
     var pdate = date.split('/');
     if (this.sods.indexOf(maker) !== -1) {
       this.url = 'http://str.sod.co.jp/' + pdate[0] + pdate[1] + '/' + pcid[1] + '_' + pcid[2] + '/' + pcid[1] + '_' + pcid[2] + '_sample.wmv';
@@ -470,16 +478,16 @@ var sample = {
   createLink: function () {
     var mybox = getId('mybox');
     var play = document.createElement('a');
-    play.href = 'javascript:void(0)';
+    //play.href = 'javascript:void(0)';
     play.appendChild(document.createTextNode('Play Sample'));
     play.addEventListener("click", gal.onPlay, false);
     mybox.appendChild(play);
   }
 };
-//Get cid of the dvd.
-function getCid(str) {
-  var cid = str.match(/\w+\d+(?:so)?/);
-  return cid[0];
+//Get cid of the dvd: type ? realcid : dmmcid
+//realcid[abcd123, abcd, 123] dmmcid[abcd123so, abcd123]
+function getCid(str, type) {
+  return type ? str.match(/([a-z]+)([0-9]+)/) : str.match(/(\w+\d+)(?:so)?/);
 }
 
 function removeChildren(e) {
@@ -496,18 +504,24 @@ function getCn(cn) {
   return document.getElementsByClassName(cn);
 }
 
-var page = /\/error\/-\/area\/=|\/detail\/|\/list\//.exec(location.pathname);
-switch (page[0]) {
-case '/list/':
-  list.init();
-  fav.init();
-  break;
-case '/error/-/area/=':
-  wish.init();
-  break;
-case '/detail/':
-  detail.init();
-  fav.init();
-  sample.init();
-  break;
-}
+(function(){
+  var welcome = document.getElementById('welcome');
+  if (welcome) {
+    welcome.parentNode.removeChild(welcome);
+  }
+  var page = /\/error\/-\/area\/=|\/detail\/|\/list\//.exec(location.pathname);
+  switch (page[0]) {
+  case '/list/':
+    list.init();
+    fav.init();
+    break;
+  case '/error/-/area/=':
+    wish.init();
+    break;
+  case '/detail/':
+    detail.init();
+    fav.init();
+    sample.init();
+    break;
+  }
+})();
