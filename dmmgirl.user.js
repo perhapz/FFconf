@@ -390,62 +390,62 @@ var gal = {
 var sample = {
   url: '',
   sods: [ //sod shop 640x480 http://str.sod.co.jp/201204/abcd_123/abcd_123_sample.wmv 
-    'SOD¥¯¥ê¥¨¥¤¥È', //SOD Create 45276
-    '¥Ç¥£©`¥×¥¹', //Deep's 40003
-    '¥Ê¥Á¥å¥é¥ë¥Ï¥¤', //Natural High 40001
-    '¥¢¥¤¥¨¥Ê¥¸©`', //IEnergy 40004
-    '¥Ò¥Ó¥Î', //hibino & switch<97 45277
-    'V£¦R¥×¥í¥À¥¯¥Ä', //V&R Products 45168
-    '¥¢¥­¥Î¥ê', //AKNR 45289
+    'SODã‚¯ãƒªã‚¨ã‚¤ãƒˆ', //SOD Create 45276
+    'ãƒ‡ã‚£ãƒ¼ãƒ—ã‚¹', //Deep's 40003
+    'ãƒŠãƒãƒ¥ãƒ©ãƒ«ãƒã‚¤', //Natural High 40001
+    'ã‚¢ã‚¤ã‚¨ãƒŠã‚¸ãƒ¼', //IEnergy 40004
+    'ãƒ’ãƒ“ãƒ', //hibino & switch<97 45277
+    'Vï¼†Rãƒ—ãƒ­ãƒ€ã‚¯ãƒ„', //V&R Products 45168
+    'ã‚¢ã‚­ãƒãƒª', //AKNR 45289
     'DANDY', //DANDY 45286
-    'LADY¡ÁLADY', //LADYxLADY 45460
+    'LADYÃ—LADY', //LADYxLADY 45460
     'Hunter', //Hunter 45287
     'GARCON', //GARCON 45504
-    '¥µ¥Ç¥£¥¹¥Æ¥£¥Ã¥¯¥ô¥£¥ì¥Ã¥¸', //Sadistic Village 45356
+    'ã‚µãƒ‡ã‚£ã‚¹ãƒ†ã‚£ãƒƒã‚¯ãƒ´ã‚£ãƒ¬ãƒƒã‚¸', //Sadistic Village 45356
     'ROCKET', //ROCKET 45371
     'AROUND', //AROUND 45562
     'KEU', //45615
     'ATOM', //45758
     'SWITCH', //>96 45914
-    'F£¦A', //F&A 45831
+    'Fï¼†A', //F&A 45831
     'new girl', //45887
     'SILK LABO', //45583
-    '¥¤¥Õ¥ê©`¥È', //ifrit 45290
-    'C£¦H', //C&H 45429
-    '¥Ô¥å¥¢¥Í¥¹¥×¥é¥Í¥Ã¥È', //pureness planet 45453
-    'ÈËég¿¼²ì', //45455
-    '¥·¥å¥¬©`¥ï©`¥¯¥¹' //Sugar Works 40163
+    'ã‚¤ãƒ•ãƒªãƒ¼ãƒˆ', //ifrit 45290
+    'Cï¼†H', //C&H 45429
+    'ãƒ”ãƒ¥ã‚¢ãƒã‚¹ãƒ—ãƒ©ãƒãƒƒãƒˆ', //pureness planet 45453
+    'äººé–“è€ƒå¯Ÿ', //45455
+    'ã‚·ãƒ¥ã‚¬ãƒ¼ãƒ¯ãƒ¼ã‚¯ã‚¹' //Sugar Works 40163
     ],
   kmps: [ //smm 320x240 http://st0.d-dx.jp/a5942/r1/unsecure/smm2012/0106/ABCD-123.wmv
     //2012/0106 2011/0712 2011/0106 10/0112 09/0112/ 08/0112
-    '¥±¥¤?¥¨¥à?¥×¥í¥Ç¥å©`¥¹', //K.M.Produce: million+¤ª¤«¤º¡£ 40071
-    '¥¹¥¯©`¥×', //Scoop 45837
-    'S¼‰ËØÈË', //45434
-    'ÓîÖæÆó»­', //45858
-    '¥Ğ¥º©`¥«£¨BAZOOKA£©', //BAZOOKA 45859
-    '¥ì¥¢¥ë¥ï©`¥¯¥¹', //Real Works 40185
-    '¤Ê¤Ç¤·¤³', //Nadeshiko 45216
+    'ã‚±ã‚¤?ã‚¨ãƒ ?ãƒ—ãƒ­ãƒ‡ãƒ¥ãƒ¼ã‚¹', //K.M.Produce: million+ãŠã‹ãšã€‚ 40071
+    'ã‚¹ã‚¯ãƒ¼ãƒ—', //Scoop 45837
+    'Sç´šç´ äºº', //45434
+    'å®‡å®™ä¼ç”»', //45858
+    'ãƒã‚ºãƒ¼ã‚«ï¼ˆBAZOOKAï¼‰', //BAZOOKA 45859
+    'ãƒ¬ã‚¢ãƒ«ãƒ¯ãƒ¼ã‚¯ã‚¹', //Real Works 40185
+    'ãªã§ã—ã“', //Nadeshiko 45216
     //also in
-    '¥»¥ó¥¿©`¥Ó¥ì¥Ã¥¸', //centervillage 45016
+    'ã‚»ãƒ³ã‚¿ãƒ¼ãƒ“ãƒ¬ãƒƒã‚¸', //centervillage 45016
     'h.m.p', //40027
-    '¥¯¥ê¥¹¥¿¥ëÓ³Ïñ', //40035
-    '¥ï©`¥×¥¨¥ó¥¿¥Æ¥¤¥ó¥á¥ó¥È', //WAAP ent. 40005
-    '¥É¥ê©`¥à¥Á¥±¥Ã¥È', //dream ticket 40025
-    '¥Ş¥Ã¥¯¥¹¥¨©`', //MAX-A 40046
-    '¥¢¥Ã¥×¥¹', //UP'S 45313
-    '¥Ö¥ê¥Ã¥È', //bullitt 45176
-    '¥Û¥Ã¥È¥¨¥ó¥¿©`¥Æ¥¤¥á¥ó¥È', //hot ent. 40045
-    '¥Ş¥­¥·¥ó¥°', //maxing 45217 only mxgs
-    '¥Ğ¥ë¥¿¥ó', //BALTAN 45700
-    '¥ï¥ó¥À¥Õ¥ë£¨ONE DA FULL£©', //45807
-    '¥µ¥à¥·¥ó¥°', //something 45489
-    '¥é¥Ş', //lama 45416
+    'ã‚¯ãƒªã‚¹ã‚¿ãƒ«æ˜ åƒ', //40035
+    'ãƒ¯ãƒ¼ãƒ—ã‚¨ãƒ³ã‚¿ãƒ†ã‚¤ãƒ³ãƒ¡ãƒ³ãƒˆ', //WAAP ent. 40005
+    'ãƒ‰ãƒªãƒ¼ãƒ ãƒã‚±ãƒƒãƒˆ', //dream ticket 40025
+    'ãƒãƒƒã‚¯ã‚¹ã‚¨ãƒ¼', //MAX-A 40046
+    'ã‚¢ãƒƒãƒ—ã‚¹', //UP'S 45313
+    'ãƒ–ãƒªãƒƒãƒˆ', //bullitt 45176
+    'ãƒ›ãƒƒãƒˆã‚¨ãƒ³ã‚¿ãƒ¼ãƒ†ã‚¤ãƒ¡ãƒ³ãƒˆ', //hot ent. 40045
+    'ãƒã‚­ã‚·ãƒ³ã‚°', //maxing 45217 only mxgs
+    'ãƒãƒ«ã‚¿ãƒ³', //BALTAN 45700
+    'ãƒ¯ãƒ³ãƒ€ãƒ•ãƒ«ï¼ˆONE DA FULLï¼‰', //45807
+    'ã‚µãƒ ã‚·ãƒ³ã‚°', //something 45489
+    'ãƒ©ãƒ', //lama 45416
     'HMJM' //45337
     ],
   pres: [ //500x376 http://download.prestige-av.com/sample_movie/ABC-123.wmv
-    '¥×¥ì¥¹¥Æ©`¥¸', //Prestige: Fullsail DOC shiroutoTV saikyo magic Zetton onemore avant opus yabusame yabustyle ase digista40136
+    'ãƒ—ãƒ¬ã‚¹ãƒ†ãƒ¼ã‚¸', //Prestige: Fullsail DOC shiroutoTV saikyo magic Zetton onemore avant opus yabusame yabustyle ase digista40136
     'MAD', //45490
-    '¥é¥¹¥È¥é¥¹' //LUSTROUS 45039
+    'ãƒ©ã‚¹ãƒˆãƒ©ã‚¹' //LUSTROUS 45039
     //'GALLOP', //GALLOP 45735 no video
     ],
   init: function () {
