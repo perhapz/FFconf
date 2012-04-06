@@ -2,7 +2,7 @@
 // @name           DMMGirl
 // @namespace      null
 // @description    DMM.R18/mono/dvd tweak for non-member: show big cover, preload sample picture, local wishlist, remove member functions...
-// @version        1.0.4
+// @version        1.0.5
 // @updateURL      https://userscripts.org/scripts/source/123770.meta.js
 // @include        http://www.dmm.co.jp/mono/dvd/-/list/*
 // @include        http://www.dmm.co.jp/error/-/area/=/navi=none/*
@@ -36,12 +36,9 @@ var detail = {
   onPreloadSample: function () {
     this.removeEventListener('click', detail.onPreloadSample, false);
     var sample = getCn('mg-b6');
-    var i = 0;
     var block = getId("sample-image-block");
     var newblock = document.createElement('div');
-    if (sample[0].tagName === "DIV") {
-      i = 1;
-    }
+    var i = (sample[0].tagName == 'div') ? 1 : 0;
     for (i; i < sample.length; i++) {
       var pic = document.createElement('img');
       pic.src = sample[i].src.replace('-', 'jp-');
@@ -357,13 +354,10 @@ var gal = {
   },
   //==Show next preview==
   onShowNext: function () {
-    var box = this.parentNode;
-    var curpic = box.firstChild;
+    var box = getId('box');
+    var curpic = box.firstChild.firstChild;
     var gal = getCn('galpic').length;
-    var num = 1;
-    if (this.id === 'leftd') {
-      num = -1;
-    }
+    var num = (this.id === 'leftd') ? -1 : 1;
     var patt = /\d+(?=\.jpg$)/;
     patt.compile(patt);
     var nextnum = parseInt(curpic.src.match(patt)[0], 10) + num;
@@ -372,11 +366,11 @@ var gal = {
       nextpic.src = curpic.src.replace(patt, nextnum);
       box.style.left = window.pageXOffset + (window.innerWidth - nextpic.width) / 2 + 'px';
       box.style.top = window.pageYOffset + (window.innerHeight - nextpic.height) / 2 + 'px';
-      box.insertBefore(nextpic, curpic);
-      box.removeChild(curpic);
+      box.firstChild.insertBefore(nextpic, curpic);
+      box.firstChild.removeChild(curpic);
     }
     else {
-      document.body.removeChild(box.parentNode.parentNode);
+      document.body.removeChild(box.parentNode);
     }
   },
   onPlay: function () {
@@ -418,7 +412,7 @@ var sample = {
     ],
   kmps: [ //smm 320x240 http://st0.d-dx.jp/a5942/r1/unsecure/smm2012/0106/ABCD-123.wmv
     //2012/0106 2011/0712 2011/0106 10/0112 09/0112/ 08/0112
-    'ケイ?エム?プロデュース', //K.M.Produce: million+おかず。 40071
+    'ケイ・エム・プロデュース', //K.M.Produce: million+おかず。 40071
     'スクープ', //Scoop 45837
     'S級素人', //45434
     '宇宙企画', //45858
