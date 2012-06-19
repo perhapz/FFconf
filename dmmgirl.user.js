@@ -2,21 +2,21 @@
 // @name           DMMGirl
 // @namespace      null
 // @description    DMM.R18/mono/dvd tweak for non-member: show big cover, preload sample picture, local wishlist, remove member functions...
-// @version        1.0.5
+// @version        1.0.6
 // @updateURL      https://userscripts.org/scripts/source/123770.meta.js
 // @include        http://www.dmm.co.jp/mono/dvd/-/list/*
 // @include        http://www.dmm.co.jp/error/-/area/=/navi=none/*
 // @include        http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=*
 // ==/UserScript==
 var detail = {
-  init: function () {
+  init: function (c) {
     GM_addStyle(' \
       #mybox {font-size:1.2em; font-weight:bold; background-color:#F7FDFF; border:1px solid #CCCCCC; padding:5px 10px; margin-bottom:20px;} \
       #mybox a {display:block; color:#005FC0; cursor:pointer; text-decoration:none; padding-left:10px; \
         background:url("http://p.dmm.co.jp/p/common/arrow_common.gif") no-repeat scroll left center transparent} \
       #mybox a:active, #mybox a:hover {color:#EE2200 !important; text-decoration:underline !important;} \
       #mybox a:visited {color:#990099 !important;}');
-    this.replaceRcolumn();
+    this.replaceRcolumn(c);
     this.showCover();
     this.addPreloadRadio();
   },
@@ -35,13 +35,12 @@ var detail = {
   //==Preload previews==
   onPreloadSample: function () {
     this.removeEventListener('click', detail.onPreloadSample, false);
-    var sample = getCn('mg-b6');
+    var sample = getCn('crs_full');
     var block = getId("sample-image-block");
     var newblock = document.createElement('div');
-    var i = (sample[0].tagName == 'div') ? 1 : 0;
-    for (i; i < sample.length; i++) {
+    for (var i = 0; i < sample.length; i++) {
       var pic = document.createElement('img');
-      pic.src = sample[i].src.replace('-', 'jp-');
+      pic.src = sample[i].firstChild.src.replace('-', 'jp-');
       pic.height = 73;
       pic.className = 'galpic';
       pic.addEventListener('click', gal.onShowPic, false);
@@ -59,7 +58,7 @@ var detail = {
     sample.className = 'mg-b20 mg-r12';
     sample.appendChild(img);
   },
-  replaceRcolumn: function () {
+  replaceRcolumn: function (c) {
     var rcolumn = getCn('vline')[0].nextElementSibling;
     var info = getCn('mg-b20')[1];
     var tbody = info.firstElementChild; //remove last 2 rows
@@ -74,7 +73,9 @@ var detail = {
       else {
         star.lastElementChild.innerHTML = '(0)';
       }
-      review.parentNode.parentNode.removeChild(review.parentNode);
+      if (c) {
+        review.parentNode.parentNode.removeChild(review.parentNode);
+      }
     }
     var box = getCn('bx-option mg-t20')[0];
     if (box) {
@@ -86,7 +87,6 @@ var detail = {
     }
     var desc = info.nextElementSibling.nextElementSibling;
     var another = getCn('another')[0];
-    var actress = getId('avcast_text');
     removeChildren(rcolumn);
     var div = document.createElement('div');
     div.id = 'mybox';
@@ -109,7 +109,6 @@ var detail = {
     if (another) {
       rcolumn.appendChild(another);
     }
-    rcolumn.appendChild(actress);
   },
   //==Add to wishlist==
   onAddWish: function () {
@@ -500,6 +499,7 @@ function getCn(cn) {
 
 (function(){
   var page = /\/error\/-\/area\/=|\/detail\/|\/list\//.exec(location.pathname);
+  var config = {removeComment: true};
   switch (page[0]) {
   case '/list/':
     list.init();
@@ -509,7 +509,7 @@ function getCn(cn) {
     wish.init();
     break;
   case '/detail/':
-    detail.init();
+    detail.init(config.removeComment);
     fav.init();
     sample.init();
     break;
