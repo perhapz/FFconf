@@ -2,7 +2,7 @@
 // @name           DMMGirl
 // @namespace      null
 // @description    DMM.R18/mono/dvd tweak for non-member: show big cover, preload sample picture, local wishlist, remove member functions...
-// @version        1.0.6
+// @version        1.0.7
 // @updateURL      https://userscripts.org/scripts/source/123770.meta.js
 // @include        http://www.dmm.co.jp/mono/dvd/-/list/*
 // @include        http://www.dmm.co.jp/error/-/area/=/navi=none/*
@@ -16,12 +16,12 @@ var detail = {
         background:url("http://p.dmm.co.jp/p/common/arrow_common.gif") no-repeat scroll left center transparent} \
       #mybox a:active, #mybox a:hover {color:#EE2200 !important; text-decoration:underline !important;} \
       #mybox a:visited {color:#990099 !important;}');
-    this.replaceRcolumn(c);
+    this.replaceRcolumn(c.comment);
     this.showCover();
-    this.addPreloadRadio();
+    this.addPreloadRadio(c.preload);
   },
   //==Add preload radio button==
-  addPreloadRadio: function () {
+  addPreloadRadio: function (c) {
     var headline = getCn("headline mg-b10 lh3")[0];
     if (headline) {
       var link = document.createElement('input');
@@ -30,6 +30,9 @@ var detail = {
       link.addEventListener("click", this.onPreloadSample, false);
       headline.appendChild(link);
       headline.appendChild(document.createTextNode("Preload "));
+    if (c) {
+      link.click();
+    }
     }
   },
   //==Preload previews==
@@ -63,18 +66,18 @@ var detail = {
     var info = getCn('mg-b20')[1];
     var tbody = info.firstElementChild; //remove last 2 rows
     tbody.removeChild(tbody.lastElementChild);
-    var review = getId('review-list');
+    var review = getId('review');
     if (review) {
       var star = tbody.lastElementChild.lastElementChild;
-      var vote = getCn('count')[0];
+      var vote = getCn('overview')[0];
       if (vote && star.lastElementChild) {
-        star.lastElementChild.innerHTML = '(' + vote.innerHTML + ')';
+        star.lastElementChild.innerHTML = '(' + vote.firstElementChild.lastElementChild.innerHTML + ')';
       }
       else {
         star.lastElementChild.innerHTML = '(0)';
       }
       if (c) {
-        review.parentNode.parentNode.removeChild(review.parentNode);
+        review.parentNode.removeChild(review);
       }
     }
     var box = getCn('bx-option mg-t20')[0];
@@ -109,6 +112,8 @@ var detail = {
     if (another) {
       rcolumn.appendChild(another);
     }
+  var ad = getCn('mg-b12  center')[0];
+  ad.parentNode.removeChild(ad);
   },
   //==Add to wishlist==
   onAddWish: function () {
@@ -126,9 +131,9 @@ var detail = {
 };
 var list = {
   init: function () {
-    var smallThumb = getCn("mg-r6");
+    var smallThumb = getCn("img");
     for (var i = 0; i < smallThumb.length; i++) {
-      smallThumb[i].addEventListener("mouseover", this.onShowThumb, false);
+      smallThumb[i].firstElementChild.addEventListener("mouseover", this.onShowThumb, false);
     }
     var thumb = new Image();
     thumb.id = 'hoverpic';
@@ -499,7 +504,10 @@ function getCn(cn) {
 
 (function(){
   var page = /\/error\/-\/area\/=|\/detail\/|\/list\//.exec(location.pathname);
-  var config = {removeComment: true};
+  var config = {
+    comment: true,  //remove comments
+    preload: false  //auto preload
+  };
   switch (page[0]) {
   case '/list/':
     list.init();
@@ -509,7 +517,7 @@ function getCn(cn) {
     wish.init();
     break;
   case '/detail/':
-    detail.init(config.removeComment);
+    detail.init(config);
     fav.init();
     sample.init();
     break;
