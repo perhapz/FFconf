@@ -11,7 +11,7 @@
 var detail = {
   init: function (c) {
     GM_addStyle(' \
-      #mybox {font-size:1.2em; font-weight:bold; background-color:#F7FDFF; border:1px solid #CCCCCC; padding:5px 10px; margin-bottom:20px;} \
+      #mybox {font-size:1.2em; font-weight:bold; background-color:#F7FDFF; border:1px solid #CCCCCC; padding:5px 10px; margin-bottom:10px;} \
       #mybox a {display:block; color:#005FC0; cursor:pointer; text-decoration:none; padding-left:10px; \
         background:url("http://p.dmm.co.jp/p/common/arrow_common.gif") no-repeat scroll left center transparent} \
       #mybox a:active, #mybox a:hover {color:#EE2200 !important; text-decoration:underline !important;} \
@@ -30,9 +30,9 @@ var detail = {
       link.addEventListener("click", this.onPreloadSample, false);
       headline.appendChild(link);
       headline.appendChild(document.createTextNode("Preload "));
-    if (c) {
-      link.click();
-    }
+      if (c) {
+        link.click();
+      }
     }
   },
   //==Preload previews==
@@ -64,6 +64,7 @@ var detail = {
   replaceRcolumn: function (c) {
     var rcolumn = getCn('vline')[0].nextElementSibling;
     var info = getCn('mg-b20')[1];
+    info.id = 'infot';
     var tbody = info.firstElementChild; //remove last 2 rows
     tbody.removeChild(tbody.lastElementChild);
     var review = getId('review');
@@ -94,15 +95,15 @@ var detail = {
     var div = document.createElement('div');
     div.id = 'mybox';
     var add = document.createElement('a');
-    add.appendChild(document.createTextNode('Add to Wishlist'));
+    add.textContent = 'Add to Wishlist';
     add.addEventListener("click", this.onAddWish, false);
     var view = document.createElement('a');
-    view.href = 'http://www.dmm.co.jp/error/-/area/=/navi=none/';
-    view.appendChild(document.createTextNode('View Wishlist'));
+    view.href = '/error/-/area/=/navi=none/';
+    view.textContent = 'View Wishlist';
     var search = document.createElement('a');
     search.href = 'http://search.supermm.jp/?ad=1&limit=60&o=0&sort=Score&style=1&q=' + getCid(location.pathname, true)[0];
     search.target = '_blank';
-    search.appendChild(document.createTextNode('Search in SMM'));    
+    search.textContent = 'Search in SMM';    
     div.appendChild(add);
     div.appendChild(view);
     div.appendChild(search);
@@ -155,7 +156,7 @@ var list = {
       thumb.width = 147;
       thumb.height = 200;
       thumb.style.display = 'block';
-      thumb.parentNode.href = 'http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + getCid(this.src)[1] + '/';
+      thumb.parentNode.href = '/mono/dvd/-/detail/=/cid=' + getCid(this.src)[1] + '/';
     }
   },
   onRemoveThumb: function () {
@@ -228,11 +229,14 @@ var wish = {
       this.maker = maker;
       this.title = title;
     }
-    for (var i = 0; i < localStorage.length; i++) {
+    for (var i = 0, j = 0; i < localStorage.length; i++) {
       var cid = localStorage.key(i);
-      var info = localStorage[cid].split('#'); //Date[0]#Actress[1]#Maker[2]#Title[3]
-      info[1] = info[1].replace(/></g, '><br /><');
-      this.dvd[i] = new Dvd(cid, info[0], info[1], info[2], info[3]);
+      if (cid[0] !== '#') {
+        var info = localStorage[cid].split('#'); //Date[0]#Actress[1]#Maker[2]#Title[3]
+        info[1] = info[1].replace(/></g, '><br /><');
+        this.dvd[j] = new Dvd(cid, info[0], info[1], info[2], info[3]);
+        j++;
+      }
     }
     //this.dvd.sort(this.by('date'));
   },
@@ -247,7 +251,7 @@ var wish = {
       item.innerHTML = ' \
         <td height="130">' + (i + 1) + '</td> \
         <td><img src="http://pics.dmm.co.jp/mono/movie/' + this.dvd[i].cid + '/' + this.dvd[i].cid + 'pt.jpg" /></td> \
-        <td><a href="http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + this.dvd[i].cid.replace(/so$/, '') + '/">' + this.dvd[i].cid + '<br /></a><p>' + this.dvd[i].title + '</p></td> \
+        <td><a href="/mono/dvd/-/detail/=/cid=' + this.dvd[i].cid.replace(/so$/, '') + '/">' + this.dvd[i].cid + '<br /></a><p>' + this.dvd[i].title + '</p></td> \
         <td>' + this.dvd[i].actress + '</td> \
         <td name="maker">' + this.dvd[i].maker + '</td> \
         <td>' + this.dvd[i].date + '</td> \
@@ -258,67 +262,147 @@ var wish = {
   }
 };
 var fav = {
+  menus: [],
   init: function () {
     GM_addStyle(' \
-      #header .hd-lnav ul li ul li {position: relative;top:-4em;margin:0;background-color:#242424} \
+      #header .hd-lnav ul li ul li {float:none; margin:0; background-color:#242424; position:relative; z-index:99} \
       #header .hd-lnav ul li ul {display:none; position:absolute;} \
-      #header .hd-lnav ul li>ul {top: auto;left: auto;} \
+      #header .hd-lnav ul li>ul {top:auto; left:auto;} \
       #header .hd-lnav ul li:hover ul {display:block}');
-    this.addMaker();
     this.addLink();
-  },
-  addMaker: function () {
-    function Menu(name, id) {
-      this.name = name;
-      this.id = id;
-    }
-    var maker = [];
-    maker[0] = new Menu('Moodyz', 1509);
-    maker[1] = new Menu('SOD', 45276);
-    maker[2] = new Menu('IP', 1219);
-    maker[3] = new Menu('S1', 3152);
-    maker[4] = new Menu('Prestige', 40136);
-    maker[5] = new Menu('EBODY', 5032);
-    createMenu('Maker', 'maker', maker);
-    var genre = [];
-    genre[0] = new Menu('Titjob', 5019);
-    genre[1] = new Menu('Blowjob', 5002);
-    genre[2] = new Menu('Handjob', 5004);
-    genre[3] = new Menu('Cum inside', 5001);
-    genre[4] = new Menu('Cum on face', 5023);
-    createMenu('Genre', 'keyword', genre);
-
-    function createMenu(menu, name, menuArr) {
-      var navBar = getCn("hd-lnav group")[0].firstElementChild;
-      var liMenu = document.createElement('li');
-      var aMenu = document.createElement('a');
-      aMenu.href = '/mono/dvd/-/' + menu.toLowerCase() + '/';
-      aMenu.appendChild(document.createTextNode(menu));
-      liMenu.appendChild(aMenu);
-      var ulMenu = document.createElement('ul');
-      liMenu.appendChild(ulMenu);
-      navBar.appendChild(liMenu);
-      for (var i = 0; i < menuArr.length; i++) {
-        var liSubmenu = document.createElement('li');
-        var aSubmenu = document.createElement('a');
-        aSubmenu.href = '/mono/dvd/-/list/=/article=' + name + '/id=' + menuArr[i].id + '/sort=date/';
-        aSubmenu.appendChild(document.createTextNode(menuArr[i].name));
-        liSubmenu.appendChild(aSubmenu);
-        ulMenu.appendChild(liSubmenu);
-      }
-    }
+    this.setMenu();
   },
   addLink: function () {
     var wishLink = document.createElement('a');
-    wishLink.href = 'http://www.dmm.co.jp/error/-/area/=/navi=none/';
-    wishLink.appendChild(document.createTextNode('Wishlist'));
+    wishLink.href = '/error/-/area/=/navi=none/';
+    wishLink.textContent = 'Wishlist';
     wishLink.style.marginLeft = '5px';
     var key = getCn('popular-keyword')[0];
     key.appendChild(wishLink);
     key.style.right = '-3em';
+  },
+  setMenu: function () {
+    function Menu (label, key) {
+      this.label = label;
+      this.key = key;
+    }
+    this.menus[0] = new Menu('Actress', 'actress');
+    this.menus[1] = new Menu('Maker', 'maker');
+    this.menus[2] = new Menu('Genre', 'keyword', '#GId', '#GName');
+    for (var i = 0; i < this.menus.length; i++) {
+      var type = this.menus[i].key[0];
+      var id = '#' + type + 'ID';
+      var name = '#' + type + 'NAME';
+      var sid = localStorage.getItem(id)
+      if (!sid){
+        localStorage.setItem(id, '[]');
+        localStorage.setItem(name, '[]');
+      }
+      else {
+        idList = JSON.parse(sid);
+        nameList = JSON.parse(localStorage.getItem(name));
+        this.createMenu(this.menus[i].label, this.menus[i].key, idList, nameList);
+      }
+    }
+  },
+  createMenu: function (label, key, id, name) {
+      var navBar = getCn("hd-lnav group")[0].firstElementChild;
+      var liMenu = document.createElement('li');
+      var aMenu = document.createElement('a');
+      aMenu.href = '/mono/dvd/-/' + label.toLowerCase() + '/';
+      aMenu.textContent = label;
+      liMenu.appendChild(aMenu);
+      var ulMenu = document.createElement('ul');
+      liMenu.appendChild(ulMenu);
+      navBar.appendChild(liMenu);
+      for (var i = 0; i < id.length; i++) {
+        var liSubmenu = document.createElement('li');
+        var aSubmenu = document.createElement('a');
+        aSubmenu.href = '/mono/dvd/-/list/=/article=' + key + '/id=' + id[i] + '/sort=date/';
+        aSubmenu.textContent = name[i];
+        liSubmenu.appendChild(aSubmenu);
+        ulMenu.appendChild(liSubmenu);
+      }
   }
 };
-
+var addfav = {
+  init: function () {
+    GM_addStyle(' \
+      #dropzone {position:absolute; left:0; top:0; width:100%; height:100%;} \
+      #dropbox {position:relative; font-size:1.2em; font-weight:bold; text-align:center; padding-top:10px; color:#005FC0; \
+        height:30px; background-color:#F7FDFF; border:2px dashed #EE2200; margin-bottom:5px; display:none} \
+      #dropbox.over {border:2px solid #005FC0;}');
+    this.addFav();
+  },
+  addFav: function () {
+    var tds = getCn('nw');
+    var k = [2, 5, 7];  //2:actress, 5: maker, 7: genre
+    for (var i = 0; i < k.length; i++) {
+      var link = tds[k[i]].nextElementSibling.children;
+      for (var j = 0; j < link.length; j++) {
+        link[j].addEventListener('dragstart', this.onDragStart, false);
+        link[j].addEventListener('dragend', this.onDragEnd, false);
+      }
+    }
+    var info = document.getElementById('infot');
+    var box = document.createElement('div');
+    box.id = 'dropbox';
+    var zone = document.createElement('div');
+    zone.id = 'dropzone';
+    box.appendChild(zone);
+    box.appendChild(document.createTextNode('Drop Here'));
+    info.parentNode.insertBefore(box, info);
+    zone.addEventListener('dragenter', this.onDragEnter, false);
+    zone.addEventListener('dragover', this.onDragOver, false);
+    zone.addEventListener('dragleave', this.onDragLeave, false);
+    zone.addEventListener('drop', this.onDrop, false);
+  },
+  onDragStart: function (e) {
+    document.getElementById('dropbox').style.display = 'block';
+    e.dataTransfer.effectAllowed = 'link'; 
+    e.dataTransfer.setData('aName', this.text);
+    e.dataTransfer.setData('aLink', this.href);
+  },
+  onDragOver: function (e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'link';
+  },
+  onDragEnter: function () {
+    this.parentNode.classList.add('over');
+  },
+  onDragLeave: function () {
+    this.parentNode.classList.remove('over');
+  },
+  onDrop: function (e) {
+    e.stopPropagation();
+    e.preventDefault();
+    this.classList.remove('over');
+    var aName = e.dataTransfer.getData('aName');
+    var aLink = e.dataTransfer.getData('aLink');
+    var aId = aLink.match(/\d+/)[0];
+    var aType = aLink.match(/article=([a-z])/)[1];
+    var itemId = '#' + aType + 'ID'
+    var itemName = '#' +aType + 'NAME';
+    //this.innerHTML=aType + ':'aName + ',' + aId;
+    aIdList = JSON.parse(localStorage.getItem(itemId));
+    if (aIdList) {
+      if(aIdList.indexOf(aId)===-1){
+        aIdList.push(aId);
+        aNameList = JSON.parse(localStorage.getItem(itemName));
+        aNameList.push(aName);
+        localStorage.setItem(itemId, JSON.stringify(aIdList));
+        localStorage.setItem(itemName, JSON.stringify(aNameList));
+      }
+    }
+    else {
+      aIdList = [];
+      aNameList = [];
+    }
+  },
+  onDragEnd: function () {
+    document.getElementById('dropbox').style.display = 'none';
+  }
+}
 var gal = {
   init: function (e, width, height) {
     var div = document.createElement('div');
@@ -477,7 +561,7 @@ var sample = {
     var mybox = getId('mybox');
     var play = document.createElement('a');
     //play.href = 'javascript:void(0)';
-    play.appendChild(document.createTextNode('Play Sample'));
+    play.textContent = 'Play Sample';
     play.addEventListener("click", gal.onPlay, false);
     mybox.appendChild(play);
   }
@@ -518,8 +602,9 @@ function getCn(cn) {
     break;
   case '/detail/':
     detail.init(config);
-    fav.init();
     sample.init();
+    fav.init();
+    addfav.init();
     break;
   }
 })();

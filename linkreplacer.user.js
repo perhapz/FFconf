@@ -6,6 +6,7 @@
 // @updateURL      https://raw.github.com/perhapz/FFconf/master/linkreplacer.user.js
 // @include        http://www.freedl.org/*
 // @include        http://www.alabout.com/*
+// @include        http://alabout.com/*
 // ==/UserScript==
 var box = document.createElement('input');
 box.type = "checkbox";
@@ -72,7 +73,7 @@ function requestPic() {
     method: "GET",
     url: link.href,
     onload: function (response) {
-      var src = response.responseText.match(/http:\/\/(img\d\d|i[123]\.imgchili|img\d|picshare\.eu\/data)[^"\s]+/); //http://img52.imageporter.com/i/00297/49x4s6jbrku8.jpg" id="looz1oo"http://picshare.eu/data/IMG
+      var src = response.responseText.match(/http:\/\/(img\d\d|i[1234]\.imgchili|img\d\.imagehyper\.com\/img)[^"\s]+/); //http://img52.imageporter.com/i/00297/49x4s6jbrku8.jpg" id="looz1oo"http://picshare.eu/data/IMG
       var img = document.createElement('img');
       if (src) {
         img.src = src[0];
