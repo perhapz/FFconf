@@ -1,14 +1,15 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name           DMMGirl
 // @namespace      null
 // @description    DMM.R18/mono/dvd tweak for non-member: show big cover, preload sample picture, local wishlist, remove member functions...
-// @version        1.0.7
+// @version        1.0.8
 // @updateURL      https://userscripts.org/scripts/source/123770.meta.js
 // @include        http://www.dmm.co.jp/mono/dvd/-/list/*
 // @include        http://www.dmm.co.jp/error/-/area/=/navi=none/*
 // @include        http://www.dmm.co.jp/mono/dvd/-/detail/=/cid=*
 // ==/UserScript==
 var detail = {
+  videoEnable: false,
   init: function (c) {
     GM_addStyle(' \
       #mybox {font-size:1.2em; font-weight:bold; background-color:#F7FDFF; border:1px solid #CCCCCC; padding:5px 10px; margin-bottom:10px;} \
@@ -17,19 +18,20 @@ var detail = {
       #mybox a:active, #mybox a:hover {color:#EE2200 !important; text-decoration:underline !important;} \
       #mybox a:visited {color:#990099 !important;}');
     this.replaceRcolumn(c.comment);
+    this.checkVideo();
     this.showCover();
     this.addPreloadRadio(c.preload);
   },
   //==Add preload radio button==
   addPreloadRadio: function (c) {
-    var headline = getCn("headline mg-b10 lh3")[0];
+    var headline = document.getElementsByClassName('headline mg-b10 lh3')[0];
     if (headline) {
       var link = document.createElement('input');
-      link.type = "radio";
-      link.id = "prelink";
-      link.addEventListener("click", this.onPreloadSample, false);
+      link.type = 'radio';
+      link.id = 'prelink';
+      link.addEventListener('click', this.onPreloadSample, false);
       headline.appendChild(link);
-      headline.appendChild(document.createTextNode("Preload "));
+      headline.appendChild(document.createTextNode('Preload '));
       if (c) {
         link.click();
       }
@@ -38,8 +40,8 @@ var detail = {
   //==Preload previews==
   onPreloadSample: function () {
     this.removeEventListener('click', detail.onPreloadSample, false);
-    var sample = getCn('crs_full');
-    var block = getId("sample-image-block");
+    var sample = document.getElementsByClassName('crs_full');
+    var block = document.getElementById('sample-image-block');
     var newblock = document.createElement('div');
     for (var i = 0; i < sample.length; i++) {
       var pic = document.createElement('img');
@@ -52,25 +54,31 @@ var detail = {
     block.parentNode.replaceChild(newblock, block);
   },
 
+  checkVideo: function() {
+    var video = document.getElementById('sample-video');
+    if (video.lastElementChild.tagName === 'NOSCRIPT') {
+      this.videoEnable = true;
+    }
+  },
   //==Show big cover==
   showCover: function () {
-    var sample = getCn('float-l mg-b20 mg-r12')[0];
-    var img = getCn('tdmm')[0];
+    var sample = document.getElementsByClassName('float-l mg-b20 mg-r12')[0];
+    var img = document.getElementsByClassName('tdmm')[0];
     img.src = img.src.replace('ps.jpg', 'pl.jpg');
     removeChildren(sample);
     sample.className = 'mg-b20 mg-r12';
     sample.appendChild(img);
   },
   replaceRcolumn: function (c) {
-    var rcolumn = getCn('vline')[0].nextElementSibling;
-    var info = getCn('mg-b20')[1];
+    var rcolumn = document.getElementsByClassName('vline')[0].nextElementSibling;
+    var info = document.getElementsByClassName('mg-b20')[1];
     info.id = 'infot';
     var tbody = info.firstElementChild; //remove last 2 rows
     tbody.removeChild(tbody.lastElementChild);
-    var review = getId('review');
+    var review = document.getElementById('review');
     if (review) {
       var star = tbody.lastElementChild.lastElementChild;
-      var vote = getCn('overview')[0];
+      var vote = document.getElementsByClassName('overview')[0];
       if (vote && star.lastElementChild) {
         star.lastElementChild.innerHTML = '(' + vote.firstElementChild.lastElementChild.innerHTML + ')';
       }
@@ -81,29 +89,29 @@ var detail = {
         review.parentNode.removeChild(review);
       }
     }
-    var box = getCn('bx-option mg-t20')[0];
+    var box = document.getElementsByClassName('bx-option mg-t20')[0];
     if (box) {
       box.parentNode.removeChild(box);
     }
-    var tag = getId('producttag');
+    var tag = document.getElementById('producttag');
     if (tag) {
       tag.parentNode.removeChild(tag);
     }
     var desc = info.nextElementSibling.nextElementSibling;
-    var another = getCn('another')[0];
+    var another = document.getElementsByClassName('another')[0];
     removeChildren(rcolumn);
     var div = document.createElement('div');
     div.id = 'mybox';
     var add = document.createElement('a');
     add.textContent = 'Add to Wishlist';
-    add.addEventListener("click", this.onAddWish, false);
+    add.addEventListener('click', this.onAddWish, false);
     var view = document.createElement('a');
     view.href = '/error/-/area/=/navi=none/';
     view.textContent = 'View Wishlist';
     var search = document.createElement('a');
-    search.href = 'http://search.supermm.jp/?ad=1&limit=60&o=0&sort=Score&style=1&q=' + getCid(location.pathname, true)[0];
+    search.href = 'https://www.google.com/#q=' + getCid(location.pathname, true)[0];
     search.target = '_blank';
-    search.textContent = 'Search in SMM';    
+    search.textContent = 'Google It';
     div.appendChild(add);
     div.appendChild(view);
     div.appendChild(search);
@@ -113,17 +121,17 @@ var detail = {
     if (another) {
       rcolumn.appendChild(another);
     }
-  var ad = getCn('mg-b12  center')[0];
+  var ad = document.getElementsByClassName('mg-b12  center')[0];
   ad.parentNode.removeChild(ad);
   },
   //==Add to wishlist==
   onAddWish: function () {
-    var tds = getCn('nw'); //[date,length,actress,director,series,maker,label,genre,cid]
+    var tds = document.getElementsByClassName('nw'); //[date,length,actress,director,series,maker,label,genre,cid]
     var date = tds[0].nextElementSibling;
     var actress = tds[2].nextElementSibling;
     var maker = tds[5].nextElementSibling;
     var cid = tds[8].nextElementSibling.innerHTML;
-    var title = getId('title'); //get title
+    var title = document.getElementById('title'); //get title
     var detail = date.innerHTML + '#' + actress.innerHTML + '#' + maker.innerHTML + '#' + title.innerHTML;
     localStorage.setItem(cid, detail);
   }
@@ -132,24 +140,24 @@ var detail = {
 };
 var list = {
   init: function () {
-    var smallThumb = getCn("img");
+    var smallThumb = document.getElementsByClassName('img');
     for (var i = 0; i < smallThumb.length; i++) {
-      smallThumb[i].firstElementChild.addEventListener("mouseover", this.onShowThumb, false);
+      smallThumb[i].firstElementChild.addEventListener('mouseover', this.onShowThumb, false);
     }
     var thumb = new Image();
     thumb.id = 'hoverpic';
     thumb.style.position = 'absolute';
     thumb.style.zIndex = 22;
     thumb.style.display = 'none';
-    thumb.addEventListener("mouseout", this.onRemoveThumb, false);
+    thumb.addEventListener('mouseout', this.onRemoveThumb, false);
     var a = document.createElement('a');
     a.appendChild(thumb);
     document.body.appendChild(a);
   },
   onShowThumb: function () {
     if (this.src.search('noimage') === -1) {
-      var thumb = getId('hoverpic');
-      thumb.src = this.src.replace("pt.jpg", "ps.jpg");
+      var thumb = document.getElementById('hoverpic');
+      thumb.src = this.src.replace('pt.jpg', 'ps.jpg');
       var pos = this.getBoundingClientRect();
       thumb.style.left = pos.left - 29 + window.pageXOffset + 'px'; //147*200,90*122
       thumb.style.top = pos.top - 39 + window.pageYOffset + 'px';
@@ -185,7 +193,7 @@ var wish = {
         <thead> \
           <tr> \
             <th width="3%">#</th> \
-            <th width="15%">Cover</th> \
+            <th width=15%">Cover</th> \
             <th width="30%" id="cid">CID</th> \
             <th width="17%" id="actress">Actress</th> \
             <th width="17%" id="maker">Maker</th> \
@@ -200,7 +208,7 @@ var wish = {
   },
   onSort: function () {
     for (var i = 0; i < 4; i++) {
-      getId(wish.sortType[i]).style.backgroundColor = '#242424';
+      document.getElementById(wish.sortType[i]).style.backgroundColor = '#242424';
     }
     this.style.backgroundColor = '#C10000';
     wish.dvd.sort(wish.by(this.id));
@@ -238,13 +246,13 @@ var wish = {
         j++;
       }
     }
-    //this.dvd.sort(this.by('date'));
+    this.dvd.sort(this.by('date'));
   },
   fillTable: function () {
     for (var i = 0; i < 4; i++) {
-      getId(this.sortType[i]).addEventListener("click", this.onSort, false);
+      document.getElementById(this.sortType[i]).addEventListener('click', this.onSort, false);
     }
-    var list = getId('wishlist');
+    var list = document.getElementById('wishlist');
     removeChildren(list);
     for (i = 0; i < this.dvd.length; i++) {
       var item = document.createElement('tr');
@@ -277,7 +285,7 @@ var fav = {
     wishLink.href = '/error/-/area/=/navi=none/';
     wishLink.textContent = 'Wishlist';
     wishLink.style.marginLeft = '5px';
-    var key = getCn('popular-keyword')[0];
+    var key = document.getElementsByClassName('popular-keyword')[0];
     key.appendChild(wishLink);
     key.style.right = '-3em';
   },
@@ -306,7 +314,7 @@ var fav = {
     }
   },
   createMenu: function (label, key, id, name) {
-      var navBar = getCn("hd-lnav group")[0].firstElementChild;
+      var navBar = document.getElementsByClassName('hd-lnav group')[0].firstElementChild;
       var liMenu = document.createElement('li');
       var aMenu = document.createElement('a');
       aMenu.href = '/mono/dvd/-/' + label.toLowerCase() + '/';
@@ -335,7 +343,7 @@ var addfav = {
     this.addFav();
   },
   addFav: function () {
-    var tds = getCn('nw');
+    var tds = document.getElementsByClassName('nw');
     var k = [2, 5, 7];  //2:actress, 5: maker, 7: genre
     for (var i = 0; i < k.length; i++) {
       var link = tds[k[i]].nextElementSibling.children;
@@ -408,7 +416,7 @@ var gal = {
     var div = document.createElement('div');
     var background = document.createElement('div');
     background.setAttribute('style', 'position:fixed; height:100%; width:100%; left:0; top:0; background-color:black; opacity:0.8;z-index:20');
-    background.addEventListener("click", function () {
+    background.addEventListener('click', function () {
       document.body.removeChild(div);
     }, true);
     var box = document.createElement('div');
@@ -429,11 +437,11 @@ var gal = {
     var leftd = document.createElement('div');
     leftd.id = 'leftd';
     leftd.setAttribute('style', 'position:absolute; left:0; top:0; height:100%; width:50%');
-    leftd.addEventListener("click", gal.onShowNext, true);
+    leftd.addEventListener('click', gal.onShowNext, true);
     var rightd = document.createElement('div');
     rightd.id = 'rightd';
     rightd.setAttribute('style', 'position:absolute; right:0; top:0; height:100%; width:50%');
-    rightd.addEventListener("click", gal.onShowNext, true);
+    rightd.addEventListener('click', gal.onShowNext, true);
     var image = document.createElement('div');
     image.appendChild(origin);
     image.appendChild(leftd);
@@ -442,9 +450,9 @@ var gal = {
   },
   //==Show next preview==
   onShowNext: function () {
-    var box = getId('box');
+    var box = document.getElementById('box');
     var curpic = box.firstChild.firstChild;
-    var gal = getCn('galpic').length;
+    var gal = document.getElementsByClassName('galpic').length;
     var num = (this.id === 'leftd') ? -1 : 1;
     var patt = /\d+(?=\.jpg$)/;
     patt.compile(patt);
@@ -462,108 +470,41 @@ var gal = {
     }
   },
   onPlay: function () {
-    var video = document.createElement('embed');
-    video.width = 640;
-    video.height = 480;
-    video.src = sample.url;
+    var video = document.createElement('div');
+    video.id = 'samplevideo';
+    video.width = 560;
+    video.height = 440;
+    video.setAttribute('style', 'border:5px solid #FFFFFF; color: #F4F4F4; font-weight:bold;');
+    video.textContent = 'Loading...';
     gal.init(video, video.width, video.height);
   }
 };
 var sample = {
-  url: '',
-  sods: [ //sod shop 640x480 http://str.sod.co.jp/201204/abcd_123/abcd_123_sample.wmv 
-    'SODクリエイト', //SOD Create 45276
-    'ディープス', //Deep's 40003
-    'ナチュラルハイ', //Natural High 40001
-    'アイエナジー', //IEnergy 40004
-    'ヒビノ', //hibino & switch<97 45277
-    'V＆Rプロダクツ', //V&R Products 45168
-    'アキノリ', //AKNR 45289
-    'DANDY', //DANDY 45286
-    'LADY×LADY', //LADYxLADY 45460
-    'Hunter', //Hunter 45287
-    'GARCON', //GARCON 45504
-    'サディスティックヴィレッジ', //Sadistic Village 45356
-    'ROCKET', //ROCKET 45371
-    'AROUND', //AROUND 45562
-    'KEU', //45615
-    'ATOM', //45758
-    'SWITCH', //>96 45914
-    'F＆A', //F&A 45831
-    'new girl', //45887
-    'SILK LABO', //45583
-    'イフリート', //ifrit 45290
-    'C＆H', //C&H 45429
-    'ピュアネスプラネット', //pureness planet 45453
-    '人間考察', //45455
-    'シュガーワークス' //Sugar Works 40163
-    ],
-  kmps: [ //smm 320x240 http://st0.d-dx.jp/a5942/r1/unsecure/smm2012/0106/ABCD-123.wmv
-    //2012/0106 2011/0712 2011/0106 10/0112 09/0112/ 08/0112
-    'ケイ・エム・プロデュース', //K.M.Produce: million+おかず。 40071
-    'スクープ', //Scoop 45837
-    'S級素人', //45434
-    '宇宙企画', //45858
-    'バズーカ（BAZOOKA）', //BAZOOKA 45859
-    'レアルワークス', //Real Works 40185
-    'なでしこ', //Nadeshiko 45216
-    //also in
-    'センタービレッジ', //centervillage 45016
-    'h.m.p', //40027
-    'クリスタル映像', //40035
-    'ワープエンタテインメント', //WAAP ent. 40005
-    'ドリームチケット', //dream ticket 40025
-    'マックスエー', //MAX-A 40046
-    'アップス', //UP'S 45313
-    'ブリット', //bullitt 45176
-    'ホットエンターテイメント', //hot ent. 40045
-    'マキシング', //maxing 45217 only mxgs
-    'バルタン', //BALTAN 45700
-    'ワンダフル（ONE DA FULL）', //45807
-    'サムシング', //something 45489
-    'ラマ', //lama 45416
-    'HMJM' //45337
-    ],
-  pres: [ //500x376 http://download.prestige-av.com/sample_movie/ABC-123.wmv
-    'プレステージ', //Prestige: Fullsail DOC shiroutoTV saikyo magic Zetton onemore avant opus yabusame yabustyle ase digista40136
-    'MAD', //45490
-    'ラストラス' //LUSTROUS 45039
-    //'GALLOP', //GALLOP 45735 no video
-    ],
   init: function () {
-    var tds = getCn('nw');
-    var maker = tds[5].nextElementSibling.firstChild.innerHTML;
-    var date = tds[0].nextElementSibling.innerHTML;
-    var cid = tds[8].nextElementSibling.innerHTML;
-    var pcid = getCid(cid, true);
-    var pdate = date.split('/');
-    if (this.sods.indexOf(maker) !== -1) {
-      this.url = 'http://str.sod.co.jp/' + pdate[0] + pdate[1] + '/' + pcid[1] + '_' + pcid[2] + '/' + pcid[1] + '_' + pcid[2] + '_sample.wmv';
-      this.createLink();
-    }
-    else if (this.pres.indexOf(maker) !== -1) {
-      this.url = 'http://download.prestige-av.com/sample_movie/' + pcid[1] + '-' + pcid[2] + '.wmv';
-      this.createLink();
-    }
-    else if (this.kmps.indexOf(maker) !== -1) {
-      var mon = '';
-      if (pdate[0] === '2012' || pdate[0] === '2011') {
-        mon = ((pdate[1] + pdate[2]) < '0701') ? '/0106/' : '/0712/';
-      }
-      else {
-        mon = '/0112/';
-      }
-      this.url = 'http://st0.d-dx.jp/a5942/r1/unsecure/smm' + pdate[0] + mon + pcid[1].toUpperCase() + '-' + pcid[2] + '.wmv';
+    if (detail.videoEnable){
       this.createLink();
     }
   },
   createLink: function () {
-    var mybox = getId('mybox');
+    var mybox = document.getElementById('mybox');
     var play = document.createElement('a');
-    //play.href = 'javascript:void(0)';
     play.textContent = 'Play Sample';
-    play.addEventListener("click", gal.onPlay, false);
+    play.addEventListener('click', gal.onPlay, false);
+    play.addEventListener('click', sample.injectScript, false);
     mybox.appendChild(play);
+  },
+  injectScript: function () {
+    function handelVideo() {
+      $('#samplevideo').load(location.pathname + 'ajax=movie/');
+    }
+    function closePlayer() {
+      $('#box').parent().remove();
+    }
+    var inject = document.createElement('script');
+    inject.appendChild(document.createTextNode('(' + handelVideo + ')();'));
+    inject.appendChild(document.createTextNode(closePlayer));
+    var sample = document.getElementsByClassName('mg-b20 mg-r12')[0];
+    sample.parentNode.insertBefore(inject, sample);
   }
 };
 //Get cid of the dvd: type ? realcid : dmmcid
@@ -576,14 +517,6 @@ function removeChildren(e) {
   while (e.firstChild) {
     e.removeChild(e.firstChild);
   }
-}
-
-function getId(id) {
-  return document.getElementById(id);
-}
-
-function getCn(cn) {
-  return document.getElementsByClassName(cn);
 }
 
 (function(){
