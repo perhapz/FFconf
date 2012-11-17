@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name           RenRenCat
 // @namespace      null
-// @description    Access public album, status and share
-// @version        1.0.1
+// @description    Access a stranger's public album, status and share
+// @version        1.0.2
 // @include        http://www.renren.com/*
 // ==/UserScript==
 
@@ -11,10 +11,11 @@
     #navi {float:right; font-weight:bold;} \
     #navi li {float:left; margin-left:5px} \
     #navi li>a{background-color:#336699; color:#FFFFFF;  text-decoration:none; padding:0 7px; white-space:nowrap; display:block} \
-    #navi li:hover>a{background-color:#FFFFFF; color: #336699} \
-    #navi li ul li {float:none; position:relative; z-index:99} \
-    #navi li ul {display:none; position:absolute; top:auto; left:auto;} \
-    #navi li:hover ul {display:block}');
+    #navi li:hover>a{background-color:#FFFFFF; color:#336699} \
+    #navi li ul li {float:none; position:relative; z-index:99; margin-left:0} \
+    #navi li ul {display:none; position:absolute; top:auto; left:auto; border:1px solid #336699;} \
+    #navi li:hover ul {display:block} \
+    #navi span {float:left; padding:0 2px; color:#D2584D; cursor:crosshair}');
 
   function Link (label, url) {
     this.label = label;
@@ -41,7 +42,6 @@
     }
     var favLink = document.querySelector('#navi li:last-child a');
     favLink.addEventListener('click', addFav, false);
-    favLink.id = id;
     var ulSubmenu = document.createElement('ul');
     favLink.parentNode.appendChild(ulSubmenu);
     for (var i = 0; i < localStorage.length; i++) {
@@ -51,11 +51,22 @@
       var aSubmenu = document.createElement('a');
       aSubmenu.href = 'http://www.renren.com/' + id;
       aSubmenu.textContent = name;
+      var del = document.createElement('span');
+      del.textContent = 'x';
+      del.className = 'del';
+      del.id = id;
+      del.addEventListener('click', delFav, false);
+      liSubmenu.appendChild(del);
       liSubmenu.appendChild(aSubmenu);
       ulSubmenu.appendChild(liSubmenu);
     }
   }
   function addFav () {
-    localStorage.setItem(this.id, document.querySelector('.username').textContent);
+    localStorage.setItem(location.href.match(/\d{8,9}/), document.querySelector('.username').textContent);
+  }
+  function delFav() {
+    localStorage.removeItem(this.id);
+    this.parentNode.removeChild(this.nextElementSibling);
+    this.parentNode.removeChild(this);
   }
 })();
