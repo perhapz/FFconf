@@ -3,6 +3,7 @@
 // @namespace      null
 // @description    Access a stranger's public album, status and share
 // @version        1.0.2
+// @updateURL      https://userscripts.org/scripts/source/140157.meta.js
 // @include        http://www.renren.com/*
 // ==/UserScript==
 
