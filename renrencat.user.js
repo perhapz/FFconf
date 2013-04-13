@@ -2,9 +2,9 @@
 // @name           RenRenCat
 // @namespace      null
 // @description    Access a stranger's public album, status and share
-// @version        1.0.2
+// @version        1.0.4
 // @updateURL      https://userscripts.org/scripts/source/140157.meta.js
-// @include        http://www.renren.com/*
+// @include        http://*.renren.com/*
 // ==/UserScript==
 
 (function(){
@@ -23,13 +23,15 @@
     this.url = url;
   }
   var links = [];
-  links[0] = new Link('Album', 'http://photo.renren.com/getalbumprofile.do?owner=');
+  links[0] = new Link('Album', 'http://photo.renren.com/photo/');
   links[1] = new Link('Status', 'http://status.renren.com/status/');
   links[2] = new Link('Share', 'http://share.renren.com/share/ShareList.do?id=');
   links[3] = new Link('+Fav', '');
   var id = location.href.match(/\d{8,9}/);
-  var box = document.getElementsByClassName('add-guide')[0];
+  var boxOld = document.getElementsByClassName('add-guide')[0];
+  var boxNew = document.getElementById('operate_area');
   var nav = document.createElement('ul');
+  var box = boxOld || boxNew;
   nav.id = 'navi';
   if (box) {
     box.appendChild(nav);
@@ -37,6 +39,7 @@
       var liMenu = document.createElement('li');
       var aMenu = document.createElement('a');
       aMenu.href = links[i].url ? (links[i].url + id) : '#';
+      aMenu.href = i ? aMenu.href : (aMenu.href + '/album-profile');
       aMenu.textContent = links[i].label;
       liMenu.appendChild(aMenu);
       nav.appendChild(liMenu);
