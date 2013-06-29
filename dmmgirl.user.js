@@ -2,7 +2,7 @@
 // @name           DMMGirl
 // @namespace      null
 // @description    DMM.R18/mono/dvd tweak for non-member: show big cover, preload sample picture, local wishlist, remove member functions...
-// @version        1.0.8
+// @version        1.0.9
 // @updateURL      https://userscripts.org/scripts/source/123770.meta.js
 // @include        http://www.dmm.co.jp/mono/dvd/-/list/*
 // @include        http://www.dmm.co.jp/error/-/area/=/navi=none/*
@@ -10,7 +10,7 @@
 // ==/UserScript==
 var detail = {
   videoEnable: false,
-  init: function (c) {
+  init: function(c) {
     GM_addStyle(' \
       #mybox {font-size:1.2em; font-weight:bold; background-color:#F7FDFF; border:1px solid #CCCCCC; padding:5px 10px; margin-bottom:10px;} \
       #mybox a {display:block; color:#005FC0; cursor:pointer; text-decoration:none; padding-left:10px; \
@@ -23,27 +23,28 @@ var detail = {
     this.addPreloadRadio(c.preload);
   },
   //==Add preload radio button==
-  addPreloadRadio: function (c) {
+  addPreloadRadio: function(c) {
     var headline = document.getElementsByClassName('headline mg-b10 lh3')[0];
-    if (headline) {
+    var nosample = document.querySelectorAll('span.nw')[0];
+    if(headline && !nosample) {
       var link = document.createElement('input');
       link.type = 'radio';
       link.id = 'prelink';
       link.addEventListener('click', this.onPreloadSample, false);
       headline.appendChild(link);
       headline.appendChild(document.createTextNode('Preload '));
-      if (c) {
+      if(c) {
         link.click();
       }
     }
   },
   //==Preload previews==
-  onPreloadSample: function () {
+  onPreloadSample: function() {
     this.removeEventListener('click', detail.onPreloadSample, false);
-    var sample = document.getElementsByClassName('crs_full');
+    var sample = document.getElementsByName('sample-image'); //
     var block = document.getElementById('sample-image-block');
     var newblock = document.createElement('div');
-    for (var i = 0; i < sample.length; i++) {
+    for(var i = 0; i < sample.length; i++) {
       var pic = document.createElement('img');
       pic.src = sample[i].firstChild.src.replace('-', 'jp-');
       pic.height = 73;
@@ -56,12 +57,12 @@ var detail = {
 
   checkVideo: function() {
     var video = document.getElementById('sample-video');
-    if (video.lastElementChild.tagName === 'NOSCRIPT') {
+    if(video.lastElementChild.tagName === 'NOSCRIPT') {
       this.videoEnable = true;
     }
   },
   //==Show big cover==
-  showCover: function () {
+  showCover: function() {
     var sample = document.getElementsByClassName('float-l mg-b20 mg-r12')[0];
     var img = document.getElementsByClassName('tdmm')[0];
     img.src = img.src.replace('ps.jpg', 'pl.jpg');
@@ -69,32 +70,31 @@ var detail = {
     sample.className = 'mg-b20 mg-r12';
     sample.appendChild(img);
   },
-  replaceRcolumn: function (c) {
+  replaceRcolumn: function(c) {
     var rcolumn = document.getElementsByClassName('vline')[0].nextElementSibling;
     var info = document.getElementsByClassName('mg-b20')[1];
     info.id = 'infot';
     var tbody = info.firstElementChild; //remove last 2 rows
     tbody.removeChild(tbody.lastElementChild);
     var review = document.getElementById('review');
-    if (review) {
+    if(review) {
       var star = tbody.lastElementChild.lastElementChild;
       var vote = document.getElementsByClassName('overview')[0];
-      if (vote && star.lastElementChild) {
+      if(vote && star.lastElementChild) {
         star.lastElementChild.innerHTML = '(' + vote.firstElementChild.lastElementChild.innerHTML + ')';
-      }
-      else {
+      } else {
         star.lastElementChild.innerHTML = '(0)';
       }
-      if (c) {
+      if(c) {
         review.parentNode.removeChild(review);
       }
     }
     var box = document.getElementsByClassName('bx-option mg-t20')[0];
-    if (box) {
+    if(box) {
       box.parentNode.removeChild(box);
     }
     var tag = document.getElementById('producttag');
-    if (tag) {
+    if(tag) {
       tag.parentNode.removeChild(tag);
     }
     var desc = info.nextElementSibling.nextElementSibling;
@@ -118,19 +118,19 @@ var detail = {
     rcolumn.appendChild(div);
     rcolumn.appendChild(info);
     rcolumn.appendChild(desc);
-    if (another) {
+    if(another) {
       rcolumn.appendChild(another);
     }
-  var ad = document.getElementsByClassName('mg-b12  center')[0];
-  ad.parentNode.removeChild(ad);
+    var ad = document.getElementsByClassName('mg-b12  center')[0];
+    ad.parentNode.removeChild(ad);
   },
   //==Add to wishlist==
-  onAddWish: function () {
-    var tds = document.getElementsByClassName('nw'); //[date,length,actress,director,series,maker,label,genre,cid]
-    var date = tds[0].nextElementSibling;
-    var actress = tds[2].nextElementSibling;
-    var maker = tds[5].nextElementSibling;
-    var cid = tds[8].nextElementSibling.innerHTML;
+  onAddWish: function() {
+    var tds = document.querySelectorAll('td.nw'); //[type,date,length,actress,director,series,maker,label,genre,cid]
+    var date = tds[1].nextElementSibling;
+    var actress = tds[3].nextElementSibling;
+    var maker = tds[6].nextElementSibling;
+    var cid = tds[9].nextElementSibling.innerHTML;
     var title = document.getElementById('title'); //get title
     var detail = date.innerHTML + '#' + actress.innerHTML + '#' + maker.innerHTML + '#' + title.innerHTML;
     localStorage.setItem(cid, detail);
@@ -139,9 +139,9 @@ var detail = {
 
 };
 var list = {
-  init: function () {
+  init: function() {
     var smallThumb = document.getElementsByClassName('img');
-    for (var i = 0; i < smallThumb.length; i++) {
+    for(var i = 0; i < smallThumb.length; i++) {
       smallThumb[i].firstElementChild.addEventListener('mouseover', this.onShowThumb, false);
     }
     var thumb = new Image();
@@ -154,8 +154,8 @@ var list = {
     a.appendChild(thumb);
     document.body.appendChild(a);
   },
-  onShowThumb: function () {
-    if (this.src.search('noimage') === -1) {
+  onShowThumb: function() {
+    if(this.src.search('noimage') === -1) {
       var thumb = document.getElementById('hoverpic');
       thumb.src = this.src.replace('pt.jpg', 'ps.jpg');
       var pos = this.getBoundingClientRect();
@@ -167,7 +167,7 @@ var list = {
       thumb.parentNode.href = '/mono/dvd/-/detail/=/cid=' + getCid(this.src)[1] + '/';
     }
   },
-  onRemoveThumb: function () {
+  onRemoveThumb: function() {
     this.style.display = 'none';
     this.src = null;
     this.parentNode.href = null;
@@ -176,7 +176,7 @@ var list = {
 var wish = {
   dvd: [],
   sortType: ['cid', 'date', 'actress', 'maker'],
-  init: function () {
+  init: function() {
     document.title = 'Wishlist';
     GM_addStyle(' \
       body,table {color:#333333; font-size:12px; font-family:"MS PGothic","Osaka";} \
@@ -206,30 +206,29 @@ var wish = {
     this.createObj();
     this.fillTable();
   },
-  onSort: function () {
-    for (var i = 0; i < 4; i++) {
+  onSort: function() {
+    for(var i = 0; i < 4; i++) {
       document.getElementById(wish.sortType[i]).style.backgroundColor = '#242424';
     }
     this.style.backgroundColor = '#C10000';
     wish.dvd.sort(wish.by(this.id));
     wish.fillTable();
   },
-  by: function (type) {
-    return function (a, b) {
+  by: function(type) {
+    return function(a, b) {
       var c = a[type];
       var d = b[type];
-      if (c === d) {
+      if(c === d) {
         return 0;
       }
-      if (c < d) {
+      if(c < d) {
         return -1;
-      }
-      else {
+      } else {
         return 1;
       }
     };
   },
-  createObj: function () {
+  createObj: function() {
     function Dvd(cid, date, actress, maker, title) {
       this.cid = cid;
       this.date = date;
@@ -237,9 +236,9 @@ var wish = {
       this.maker = maker;
       this.title = title;
     }
-    for (var i = 0, j = 0; i < localStorage.length; i++) {
+    for(var i = 0, j = 0; i < localStorage.length; i++) {
       var cid = localStorage.key(i);
-      if (cid[0] !== '#') {
+      if(cid[0] !== '#') {
         var info = localStorage[cid].split('#'); //Date[0]#Actress[1]#Maker[2]#Title[3]
         info[1] = info[1].replace(/></g, '><br /><');
         this.dvd[j] = new Dvd(cid, info[0], info[1], info[2], info[3]);
@@ -248,13 +247,13 @@ var wish = {
     }
     this.dvd.sort(this.by('date'));
   },
-  fillTable: function () {
-    for (var i = 0; i < 4; i++) {
+  fillTable: function() {
+    for(var i = 0; i < 4; i++) {
       document.getElementById(this.sortType[i]).addEventListener('click', this.onSort, false);
     }
     var list = document.getElementById('wishlist');
     removeChildren(list);
-    for (i = 0; i < this.dvd.length; i++) {
+    for(i = 0; i < this.dvd.length; i++) {
       var item = document.createElement('tr');
       item.innerHTML = ' \
         <td height="130">' + (i + 1) + '</td> \
@@ -271,7 +270,7 @@ var wish = {
 };
 var fav = {
   menus: [],
-  init: function () {
+  init: function() {
     GM_addStyle(' \
       #header .hd-lnav ul li ul li {float:none; margin:0; background-color:#242424; position:relative; z-index:99} \
       #header .hd-lnav ul li ul {display:none; position:absolute;} \
@@ -280,7 +279,7 @@ var fav = {
     this.addLink();
     this.setMenu();
   },
-  addLink: function () {
+  addLink: function() {
     var wishLink = document.createElement('a');
     wishLink.href = '/error/-/area/=/navi=none/';
     wishLink.textContent = 'Wishlist';
@@ -289,52 +288,51 @@ var fav = {
     key.appendChild(wishLink);
     key.style.right = '-3em';
   },
-  setMenu: function () {
-    function Menu (label, key) {
+  setMenu: function() {
+    function Menu(label, key) {
       this.label = label;
       this.key = key;
     }
     this.menus[0] = new Menu('Actress', 'actress');
     this.menus[1] = new Menu('Maker', 'maker');
     this.menus[2] = new Menu('Genre', 'keyword', '#GId', '#GName');
-    for (var i = 0; i < this.menus.length; i++) {
+    for(var i = 0; i < this.menus.length; i++) {
       var type = this.menus[i].key[0];
       var id = '#' + type + 'ID';
       var name = '#' + type + 'NAME';
-      var sid = localStorage.getItem(id)
-      if (!sid){
+      var sid = localStorage.getItem(id);
+      if(!sid) {
         localStorage.setItem(id, '[]');
         localStorage.setItem(name, '[]');
-      }
-      else {
-        idList = JSON.parse(sid);
-        nameList = JSON.parse(localStorage.getItem(name));
+      } else {
+        var idList = JSON.parse(sid);
+        var nameList = JSON.parse(localStorage.getItem(name));
         this.createMenu(this.menus[i].label, this.menus[i].key, idList, nameList);
       }
     }
   },
-  createMenu: function (label, key, id, name) {
-      var navBar = document.getElementsByClassName('hd-lnav group')[0].firstElementChild;
-      var liMenu = document.createElement('li');
-      var aMenu = document.createElement('a');
-      aMenu.href = '/mono/dvd/-/' + label.toLowerCase() + '/';
-      aMenu.textContent = label;
-      liMenu.appendChild(aMenu);
-      var ulMenu = document.createElement('ul');
-      liMenu.appendChild(ulMenu);
-      navBar.appendChild(liMenu);
-      for (var i = 0; i < id.length; i++) {
-        var liSubmenu = document.createElement('li');
-        var aSubmenu = document.createElement('a');
-        aSubmenu.href = '/mono/dvd/-/list/=/article=' + key + '/id=' + id[i] + '/sort=date/';
-        aSubmenu.textContent = name[i];
-        liSubmenu.appendChild(aSubmenu);
-        ulMenu.appendChild(liSubmenu);
-      }
+  createMenu: function(label, key, id, name) {
+    var navBar = document.getElementsByClassName('hd-lnav group')[0].firstElementChild;
+    var liMenu = document.createElement('li');
+    var aMenu = document.createElement('a');
+    aMenu.href = '/mono/dvd/-/' + label.toLowerCase() + '/';
+    aMenu.textContent = label;
+    liMenu.appendChild(aMenu);
+    var ulMenu = document.createElement('ul');
+    liMenu.appendChild(ulMenu);
+    navBar.appendChild(liMenu);
+    for(var i = 0; i < id.length; i++) {
+      var liSubmenu = document.createElement('li');
+      var aSubmenu = document.createElement('a');
+      aSubmenu.href = '/mono/dvd/-/list/=/article=' + key + '/id=' + id[i] + '/sort=date/';
+      aSubmenu.textContent = name[i];
+      liSubmenu.appendChild(aSubmenu);
+      ulMenu.appendChild(liSubmenu);
+    }
   }
 };
 var addfav = {
-  init: function () {
+  init: function() {
     GM_addStyle(' \
       #dropzone {position:absolute; left:0; top:0; width:100%; height:100%;} \
       #dropbox {position:relative; font-size:1.2em; font-weight:bold; text-align:center; padding-top:10px; color:#005FC0; \
@@ -342,12 +340,12 @@ var addfav = {
       #dropbox.over {border:2px solid #005FC0;}');
     this.addFav();
   },
-  addFav: function () {
+  addFav: function() {
     var tds = document.getElementsByClassName('nw');
-    var k = [2, 5, 7];  //2:actress, 5: maker, 7: genre
-    for (var i = 0; i < k.length; i++) {
+    var k = [3, 6, 8]; //3:actress, 6: maker, 8: genre
+    for(var i = 0; i < k.length; i++) {
       var link = tds[k[i]].nextElementSibling.children;
-      for (var j = 0; j < link.length; j++) {
+      for(var j = 0; j < link.length; j++) {
         link[j].addEventListener('dragstart', this.onDragStart, false);
         link[j].addEventListener('dragend', this.onDragEnd, false);
       }
@@ -365,23 +363,23 @@ var addfav = {
     zone.addEventListener('dragleave', this.onDragLeave, false);
     zone.addEventListener('drop', this.onDrop, false);
   },
-  onDragStart: function (e) {
+  onDragStart: function(e) {
     document.getElementById('dropbox').style.display = 'block';
-    e.dataTransfer.effectAllowed = 'link'; 
+    e.dataTransfer.effectAllowed = 'link';
     e.dataTransfer.setData('aName', this.text);
     e.dataTransfer.setData('aLink', this.href);
   },
-  onDragOver: function (e) {
+  onDragOver: function(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'link';
   },
-  onDragEnter: function () {
+  onDragEnter: function() {
     this.parentNode.classList.add('over');
   },
-  onDragLeave: function () {
+  onDragLeave: function() {
     this.parentNode.classList.remove('over');
   },
-  onDrop: function (e) {
+  onDrop: function(e) {
     e.stopPropagation();
     e.preventDefault();
     this.classList.remove('over');
@@ -389,34 +387,33 @@ var addfav = {
     var aLink = e.dataTransfer.getData('aLink');
     var aId = aLink.match(/\d+/)[0];
     var aType = aLink.match(/article=([a-z])/)[1];
-    var itemId = '#' + aType + 'ID'
-    var itemName = '#' +aType + 'NAME';
+    var itemId = '#' + aType + 'ID';
+    var itemName = '#' + aType + 'NAME';
     //this.innerHTML=aType + ':'aName + ',' + aId;
-    aIdList = JSON.parse(localStorage.getItem(itemId));
-    if (aIdList) {
-      if(aIdList.indexOf(aId)===-1){
+    var aIdList = JSON.parse(localStorage.getItem(itemId));
+    if(aIdList) {
+      if(aIdList.indexOf(aId) === -1) {
         aIdList.push(aId);
-        aNameList = JSON.parse(localStorage.getItem(itemName));
+        var aNameList = JSON.parse(localStorage.getItem(itemName));
         aNameList.push(aName);
         localStorage.setItem(itemId, JSON.stringify(aIdList));
         localStorage.setItem(itemName, JSON.stringify(aNameList));
       }
-    }
-    else {
+    } else {
       aIdList = [];
       aNameList = [];
     }
   },
-  onDragEnd: function () {
+  onDragEnd: function() {
     document.getElementById('dropbox').style.display = 'none';
   }
-}
+};
 var gal = {
-  init: function (e, width, height) {
+  init: function(e, width, height) {
     var div = document.createElement('div');
     var background = document.createElement('div');
     background.setAttribute('style', 'position:fixed; height:100%; width:100%; left:0; top:0; background-color:black; opacity:0.8;z-index:20');
-    background.addEventListener('click', function () {
+    background.addEventListener('click', function() {
       document.body.removeChild(div);
     }, true);
     var box = document.createElement('div');
@@ -431,7 +428,7 @@ var gal = {
     box.appendChild(e);
   },
   //==Show preview gallery==
-  onShowPic: function () {
+  onShowPic: function() {
     var origin = new Image();
     origin.src = this.src;
     var leftd = document.createElement('div');
@@ -449,7 +446,7 @@ var gal = {
     gal.init(image, origin.width, origin.height);
   },
   //==Show next preview==
-  onShowNext: function () {
+  onShowNext: function() {
     var box = document.getElementById('box');
     var curpic = box.firstChild.firstChild;
     var gal = document.getElementsByClassName('galpic').length;
@@ -457,19 +454,18 @@ var gal = {
     var patt = /\d+(?=\.jpg$)/;
     patt.compile(patt);
     var nextnum = parseInt(curpic.src.match(patt)[0], 10) + num;
-    if (nextnum <= gal && nextnum > 0) {
+    if(nextnum <= gal && nextnum > 0) {
       var nextpic = new Image();
       nextpic.src = curpic.src.replace(patt, nextnum);
       box.style.left = window.pageXOffset + (window.innerWidth - nextpic.width) / 2 + 'px';
       box.style.top = window.pageYOffset + (window.innerHeight - nextpic.height) / 2 + 'px';
       box.firstChild.insertBefore(nextpic, curpic);
       box.firstChild.removeChild(curpic);
-    }
-    else {
+    } else {
       document.body.removeChild(box.parentNode);
     }
   },
-  onPlay: function () {
+  onPlay: function() {
     var video = document.createElement('div');
     video.id = 'samplevideo';
     video.width = 560;
@@ -480,12 +476,12 @@ var gal = {
   }
 };
 var sample = {
-  init: function () {
-    if (detail.videoEnable){
+  init: function() {
+    if(detail.videoEnable) {
       this.createLink();
     }
   },
-  createLink: function () {
+  createLink: function() {
     var mybox = document.getElementById('mybox');
     var play = document.createElement('a');
     play.textContent = 'Play Sample';
@@ -493,10 +489,11 @@ var sample = {
     play.addEventListener('click', sample.injectScript, false);
     mybox.appendChild(play);
   },
-  injectScript: function () {
+  injectScript: function() {
     function handelVideo() {
       $('#samplevideo').load(location.pathname + 'ajax=movie/');
     }
+
     function closePlayer() {
       $('#box').parent().remove();
     }
@@ -509,23 +506,26 @@ var sample = {
 };
 //Get cid of the dvd: type ? realcid : dmmcid
 //realcid[abcd123, abcd, 123] dmmcid[abcd123so, abcd123]
+
+
 function getCid(str, type) {
   return type ? str.match(/([a-z]+)([0-9]+)/) : str.match(/(\w+\d+)(?:so)?/);
 }
 
 function removeChildren(e) {
-  while (e.firstChild) {
+  while(e.firstChild) {
     e.removeChild(e.firstChild);
   }
 }
 
-(function(){
+(function() {
   var page = /\/error\/-\/area\/=|\/detail\/|\/list\//.exec(location.pathname);
   var config = {
-    comment: true,  //remove comments
-    preload: false  //auto preload
+    comment: true,
+    //remove comments
+    preload: false //auto preload
   };
-  switch (page[0]) {
+  switch(page[0]) {
   case '/list/':
     list.init();
     fav.init();
